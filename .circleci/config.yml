@@ -1,0 +1,44 @@
+# CircleCI configuration file for Go project.
+# @author - Ali Shanaakh.
+#
+
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.11
+    working_directory: /go/src/github.com/palestin-nights/backend
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: v1-pkg-cache
+
+      - run:
+          name: Install dependencies
+          command: "go get ./..."
+
+      - save_cache:
+          key: v1-pkg-cache
+          paths:
+            - "/go/pkg"
+
+      - run:
+          name: Run unit tests
+          command: "go test -v -race ./..."
+
+      - run:
+          name: Lint code
+          command: |
+            go get github.com/golang/lint/golint
+            golint -set_exit_status $(go list ./...)
+
+      - run:
+          name: Build assets
+          command: "go build main"
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build
