@@ -16,7 +16,7 @@ func TestMain(m *testing.M) {
 	databasePassword := getEnv("DATABASE_PASSWORD", "ladmdetouris")
 	databaseName := getEnv("DATABASE_NAME", "restaurant")
 	databaseHost := getEnv("DATABASE_HOST", "localhost")
-	databasePort := getEnv("DATABASE_NAME", "3306")
+	databasePort := getEnv("DATABASE_PORT", "3306")
 
 	a = *GetApp(databaseUser, databasePassword, databaseName, databaseHost, databasePort)
 
