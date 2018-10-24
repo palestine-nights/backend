@@ -45,6 +45,7 @@ func (a *App) Run(port string) {
 
 func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/table/{id:[0-9]+}", a.getTable).Methods("GET")
+	a.Router.HandleFunc("/table", a.postTable).Methods("POST")
 }
 
 func (a *App) getTable(w http.ResponseWriter, r *http.Request) {
@@ -61,6 +62,23 @@ func (a *App) getTable(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	respondWithJSON(w, http.StatusOK, t)
+}
+
+func (a *App) postTable(w http.ResponseWriter, r *http.Request) {
+	var t table
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&t); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	if t.Places == 0 {
+		respondWithError(w, http.StatusBadRequest, "Places count should be more than 0")
+		return
+	}
+	defer r.Body.Close()
+	t.ID = 0
+	t.createTable(a.DB)
+	respondWithJSON(w, http.StatusCreated, t)
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {

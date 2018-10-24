@@ -16,6 +16,10 @@ func (table) getTable(db *gorm.DB, id int) *table {
 	return &t
 }
 
+func (t *table) createTable(db *gorm.DB) {
+	db.Save(t)
+}
+
 func (table) TableName() string {
 	return "tables"
 }
