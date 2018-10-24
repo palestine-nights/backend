@@ -2,18 +2,24 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"log"
 	"testing"
 )
 
 var a App
 
 func TestMain(m *testing.M) {
-	a = App{}
-	a.Initialize("tours_admin", "ladmdetouris", "restaurant")
+	databaseUser := getEnv("DATABASE_USER", "tours_admin")
+	databasePassword := getEnv("DATABASE_PASSWORD", "ladmdetouris")
+	databaseName := getEnv("DATABASE_NAME", "restaurant")
+	databaseHost := getEnv("DATABASE_HOST", "localhost")
+	databasePort := getEnv("DATABASE_NAME", "3306")
+
+	a = *GetApp(databaseUser, databasePassword, databaseName, databaseHost, databasePort)
+
 	ensureTableExists()
 	code := m.Run()
 	os.Exit(code)

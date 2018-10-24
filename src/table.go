@@ -6,9 +6,9 @@ import (
 )
 
 type table struct {
-	ID			int		`json:"id"`
-	Places		int		`json:"places"`
-	Description	string	`json:"description"`
+	ID          int    `json:"id"`
+	Places      int    `json:"places"`
+	Description string `json:"description"`
 }
 
 func (t *table) getTable(db *sql.DB) error {

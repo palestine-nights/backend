@@ -7,6 +7,17 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.11
+        environment:
+          DATABASE_USER=root
+          DATABASE_PASSWORD=circleci
+          DATABASE_NAME=circleci
+          DATABASE_PORT=3306
+          DATABASE_HOST=localhost
+      - image: circleci/mysql
+        environment:
+          MYSQL_ROOT_PASSWORD=circleci
+          MYSQL_ROOT_HOST=%
+          MYSQL_DATABASE=circleci
     working_directory: /go/src/github.com/palestin-nights/backend
     steps:
       - checkout
@@ -24,8 +35,18 @@ jobs:
             - "/go/pkg"
 
       - run:
+          name: Install dockerize
+          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.3.0
+
+      - run:
+          name: Wait for database
+          command: dockerize -wait tcp://localhost:3306 -timeout 1m
+
+      - run:
           name: Run unit tests
-          command: "go test -v -race ./..."
+          command: "go test ./..."
 
       - run:
           name: Lint code
@@ -35,7 +56,7 @@ jobs:
 
       - run:
           name: Build assets
-          command: "go build main"
+          command: "go build src/"
 
 workflows:
   version: 2
