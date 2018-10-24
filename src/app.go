@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -9,12 +8,14 @@ import (
 	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
 )
 
 type App struct {
 	Router *mux.Router
-	DB     *sql.DB
+	DB     *gorm.DB
 }
 
 func GetApp(user, password, database, host, port string) *App {
@@ -22,7 +23,8 @@ func GetApp(user, password, database, host, port string) *App {
 
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, database)
 
-	DB, err := sql.Open("mysql", connectionString)
+	DB, err := gorm.Open("mysql", connectionString)
+	DB.AutoMigrate(&table{})
 
 	if err != nil {
 		log.Fatal(err)
@@ -52,14 +54,10 @@ func (a *App) getTable(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid table ID, must be int")
 		return
 	}
-	t := table{ID: id}
-	if err := t.getTable(a.DB); err != nil {
-		switch err {
-		case sql.ErrNoRows:
-			respondWithError(w, http.StatusNotFound, "No such table")
-		default:
-			respondWithError(w, http.StatusInternalServerError, err.Error())
-		}
+	t := table.getTable(table{}, a.DB, id)
+
+	if t.ID == 0 {
+		respondWithError(w, http.StatusNotFound, fmt.Sprintf("Table with id %d could not be found", id))
 		return
 	}
 	respondWithJSON(w, http.StatusOK, t)

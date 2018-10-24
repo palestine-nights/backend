@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -20,30 +19,18 @@ func TestMain(m *testing.M) {
 
 	a = *GetApp(databaseUser, databasePassword, databaseName, databaseHost, databasePort)
 
-	ensureTableExists()
 	code := m.Run()
 	os.Exit(code)
 }
 
-func TestEmptyTable(t *testing.T) {
-	// TODO: clear table here
-	req, _ := http.NewRequest("GET", "/users", nil)
-	response := executeRequest(req)
-	checkResponseCode(t, http.StatusOK, response.Code)
-	if body := response.Body.String(); body != "[]" {
-		t.Errorf("Expected an empty array. Got %s", body)
-	}
-}
-
 func TestGetNonExistentTable(t *testing.T) {
-	// TODO: clear table here
-	req, _ := http.NewRequest("GET", "/table/150", nil)
+	req, _ := http.NewRequest("GET", "/table/1500", nil)
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusNotFound, response.Code)
 	var m map[string]string
 	json.Unmarshal(response.Body.Bytes(), &m)
-	if m["error"] != "Table not found" {
-		t.Errorf("Expected the 'error' key of the response to be set to 'Table not found'. Got '%s'", m["error"])
+	if m["error"] != "Table with id 1500 could not be found" {
+		t.Errorf("Expected the 'error' key of the response to be set to 'Table with id 1500 could not be found'. Got '%s'", m["error"])
 	}
 }
 
@@ -71,23 +58,3 @@ func checkResponseCode(t *testing.T, expected, actual int) {
 		t.Errorf("Expected response code %d. Got %d\n", expected, actual)
 	}
 }
-
-func ensureTableExists() {
-	if _, err := a.DB.Exec(tablesTableCreationQuery); err != nil {
-		log.Fatal(err)
-	}
-}
-
-func clearTablesTable() {
-	a.DB.Exec("DELETE FROM tables")
-	a.DB.Exec("ALTER TABLE tables AUTO_INCREMENT = 1")
-}
-
-const tablesTableCreationQuery = `
-CREATE TABLE IF NOT EXISTS tables
-(
-	id INT AUTO_INCREMENT PRIMARY KEY,
-	places INT NOT NULL DEFAULT 0,
-	description VARCHAR(250) NULL
-)
-`

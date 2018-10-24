@@ -1,17 +1,21 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
+	"github.com/jinzhu/gorm"
 )
 
 type table struct {
-	ID          int    `json:"id"`
+	ID          int    `json:"id" gorm:"primary_key"`
 	Places      int    `json:"places"`
 	Description string `json:"description"`
 }
 
-func (t *table) getTable(db *sql.DB) error {
-	statement := fmt.Sprintf("SELECT id, places, description FROM tables WHERE id = ?")
-	return db.QueryRow(statement, t.ID).Scan(&t.ID, &t.Places, &t.Description)
+func (table) getTable(db *gorm.DB, id int) *table {
+	t := table{}
+	db.First(&t, id)
+	return &t
+}
+
+func (table) TableName() string {
+	return "tables"
 }
