@@ -9,8 +9,6 @@ func main() {
 
 	port := getEnv("PORT", "8080")
 
-	// You need to set your username and password here.
 	app := GetApp(databaseUser, databasePassword, databaseName, databaseHost, databasePort)
-
-	app.Run(port)
+	app.Server(port)
 }

@@ -8,19 +8,19 @@ import (
 	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
+// App is structure with router and DB instanses.
 type App struct {
 	Router *mux.Router
 	DB     *gorm.DB
 }
 
+// GetApp returns applocation instanses.
 func GetApp(user, password, database, host, port string) *App {
-	// connectionString := fmt.Sprintf("%s:%s@/%s", user, password, database)
-
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, database)
 
 	DB, err := gorm.Open("mysql", connectionString)
@@ -38,7 +38,8 @@ func GetApp(user, password, database, host, port string) *App {
 	return &app
 }
 
-func (a *App) Run(port string) {
+// Server runs application server.
+func (a *App) Server(port string) {
 	log.Printf("Listening on port " + port)
 	log.Fatal(http.ListenAndServe(":"+port, a.Router))
 }
