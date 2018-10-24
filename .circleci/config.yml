@@ -8,16 +8,16 @@ jobs:
     docker:
       - image: circleci/golang:1.11
         environment:
-          DATABASE_USER=root
-          DATABASE_PASSWORD=circleci
-          DATABASE_NAME=circleci
-          DATABASE_PORT=3306
-          DATABASE_HOST=localhost
+          DATABASE_USER: root
+          DATABASE_PASSWORD: circleci
+          DATABASE_NAME: circleci
+          DATABASE_PORT: '3306'
+          DATABASE_HOST: localhost
       - image: circleci/mysql
         environment:
-          MYSQL_ROOT_PASSWORD=circleci
-          MYSQL_ROOT_HOST=%
-          MYSQL_DATABASE=circleci
+          MYSQL_ROOT_PASSWORD: circleci
+          MYSQL_ROOT_HOST: '%'
+          MYSQL_DATABASE: circleci
     working_directory: /go/src/github.com/palestin-nights/backend
     steps:
       - checkout
