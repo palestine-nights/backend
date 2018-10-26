@@ -13,13 +13,13 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-// App is structure with router and DB instanses.
+// App is structure with router and DB instances.
 type App struct {
 	Router *mux.Router
 	DB     *gorm.DB
 }
 
-// GetApp returns applocation instanses.
+// GetApp returns applocation instances.
 func GetApp(user, password, database, host, port string) *App {
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, database)
 
