@@ -198,6 +198,56 @@ func TestDelete(t *testing.T) {
 	checkResponseCode(t, http.StatusNotFound, response.Code)
 }
 
+// Create 2 tables and check if they are in list
+func TestList(t *testing.T) {
+	// Create 2 tables
+	// 1
+	places1 := 1 + rand.Int() % 10
+	desc1 := "description" + strconv.FormatInt(rand.Int63() % 100, 10)
+	str := fmt.Sprintf("{\"places\":%d,\"description\":\"%s\"}", places1, desc1)
+	payload := []byte(str)
+	req, _ := http.NewRequest("POST", "/table", bytes.NewBuffer(payload))
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusCreated, response.Code)
+	var t1 table
+	json.Unmarshal(response.Body.Bytes(), &t1)
+
+	// 2
+	places2 := 1 + rand.Int() % 10
+	desc2 := "description" + strconv.FormatInt(rand.Int63() % 100, 10)
+	str = fmt.Sprintf("{\"places\":%d,\"description\":\"%s\"}", places2, desc2)
+	payload = []byte(str)
+	req, _ = http.NewRequest("POST", "/table", bytes.NewBuffer(payload))
+	response = executeRequest(req)
+	checkResponseCode(t, http.StatusCreated, response.Code)
+	var t2 table
+	json.Unmarshal(response.Body.Bytes(), &t2)
+
+	// Get list
+	req, _ = http.NewRequest("GET", "/tables", bytes.NewBuffer(payload))
+	response = executeRequest(req)
+	checkResponseCode(t, http.StatusOK, response.Code)
+	var tables []table
+	json.Unmarshal(response.Body.Bytes(), &tables)
+	// Check if created tables present
+	b1 := false
+	b2 := false
+	for _, tbl := range tables {
+		if tbl.ID == t1.ID && tbl.Places == places1 && tbl.Description == desc1 {
+			b1 = true
+		}
+		if tbl.ID == t2.ID && tbl.Places == places2 && tbl.Description == desc2 {
+			b2 = true
+		}
+	}
+	if b1 == false {
+		t.Errorf("Expected table with id %d to be in list, but didn't found or info didn't match", t1.ID)
+	}
+	if b2 == false {
+		t.Errorf("Expected table with id %d to be in list, but didn't found or info didn't match", t2.ID)
+	}
+}
+
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
 	a.Router.ServeHTTP(rr, req)

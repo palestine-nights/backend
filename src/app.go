@@ -49,6 +49,16 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/table", a.postTable).Methods("POST")
 	a.Router.HandleFunc("/table/{id:[0-9]+}", a.putTable).Methods("PUT")
 	a.Router.HandleFunc("/table/{id:[0-9]+}", a.deleteTable).Methods("DELETE")
+	a.Router.HandleFunc("/tables", a.listTables).Methods("GET")
+}
+
+func (a *App) listTables(w http.ResponseWriter, r *http.Request) {
+	t := table.getList(table{}, a.DB)
+	if t == nil {
+		respondWithError(w, http.StatusInternalServerError, "Error")
+	} else {
+		respondWithJSON(w, http.StatusOK, t)
+	}
 }
 
 func (a *App) getTable(w http.ResponseWriter, r *http.Request) {

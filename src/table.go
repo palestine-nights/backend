@@ -11,6 +11,12 @@ type table struct {
 	Description string `json:"description"`
 }
 
+func (table) getList(db *gorm.DB) *[]table {
+	var t []table
+	db.Find(&t)
+	return &t
+}
+
 func (table) getTable(db *gorm.DB, id int) *table {
 	t := table{}
 	db.First(&t, id)
