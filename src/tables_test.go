@@ -31,8 +31,8 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-// Create table and check it's existence
-func TestCreateTable(t *testing.T) {
+// Create table and check it's existence. Update 0 places, update OK, incorrect JSON
+func TestCreateUpdateTable(t *testing.T) {
 	// Create
 	places := 1 + rand.Int() % 10
 	desc := "description" + strconv.FormatInt(rand.Int63() % 100, 10)
@@ -50,8 +50,14 @@ func TestCreateTable(t *testing.T) {
 		t.Errorf("Expected 'description' to be %s. Got %s", desc, t1.Description)
 	}
 
-	// Check
+	// Update 0 places
 	url := "/table/" + strconv.FormatInt(int64(t1.ID), 10)
+	payload = []byte(`{"places":0,"description":"test update 0 places"}`)
+	req, _ = http.NewRequest("PUT", url, bytes.NewBuffer(payload))
+	response = executeRequest(req)
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+
+	// Check
 	req, _ = http.NewRequest("GET", url, nil)
 	response = executeRequest(req)
 	checkResponseCode(t, http.StatusOK, response.Code)
@@ -65,6 +71,31 @@ func TestCreateTable(t *testing.T) {
 	}
 	if t2.Description != t1.Description {
 		t.Errorf("Expected 'description' to be %s. Got %s", t1.Description, t2.Description)
+	}
+
+	// Update OK
+	payload = []byte(`{"places":10,"description":"test update 10 places"}`)
+	req, _ = http.NewRequest("PUT", url, bytes.NewBuffer(payload))
+	response = executeRequest(req)
+	checkResponseCode(t, http.StatusOK, response.Code)
+	var t3 table
+	json.Unmarshal(response.Body.Bytes(), &t3)
+	if t3.Places != 10 {
+		t.Errorf("Expected 'places' to be 10. Got %d", t3.Places)
+	}
+	if t3.Description != "test update 10 places" {
+		t.Errorf("Expected 'description' to be 'test update 10 places'. Got %s", t3.Description)
+	}
+
+	// Incorrect JSON
+	payload = []byte(`{"places":"string","description":"d"}`)
+	req, _ = http.NewRequest("PUT", url, bytes.NewBuffer(payload))
+	response = executeRequest(req)
+	checkResponseCode(t, http.StatusBadRequest, response.Code)
+	var m map[string]string
+	json.Unmarshal(response.Body.Bytes(), &m)
+	if m["error"] != "Invalid request payload" {
+		t.Errorf("Expected the 'error' key of the response to be set to 'Invalid request payload'. Got '%s'", m["error"])
 	}
 }
 
@@ -115,6 +146,19 @@ func TestCreateWithExistingId(t *testing.T) {
 	json.Unmarshal(response.Body.Bytes(), &t1)
 	if t1.ID == 1 {
 		t.Errorf("Expected 'id' to be not 1. Got %d", t1.ID)
+	}
+}
+
+// Update table with id that not exists
+func TestUpdateNotExistentTable(t *testing.T) {
+	payload := []byte(`{"places":3,"description":"test put"}`)
+	req, _ := http.NewRequest("PUT", "/table/500", bytes.NewBuffer(payload))
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusNotFound, response.Code)
+	var t1 table
+	json.Unmarshal(response.Body.Bytes(), &t1)
+	if t1.ID == 500 {
+		t.Errorf("Expected 'id' to be not 500. Got %d", t1.ID)
 	}
 }
 

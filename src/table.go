@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"github.com/jinzhu/gorm"
 )
 
@@ -18,6 +19,15 @@ func (table) getTable(db *gorm.DB, id int) *table {
 
 func (t *table) createTable(db *gorm.DB) {
 	db.Save(t)
+}
+
+func (t *table) updateTable(db *gorm.DB) error {
+	tbl := table.getTable(table{}, db, t.ID)
+	if tbl.ID == 0 {
+		return errors.New("table with such id not found")
+	}
+	db.Save(t)
+	return nil
 }
 
 func (table) TableName() string {

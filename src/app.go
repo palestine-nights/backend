@@ -47,6 +47,8 @@ func (a *App) Server(port string) {
 func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/table/{id:[0-9]+}", a.getTable).Methods("GET")
 	a.Router.HandleFunc("/table", a.postTable).Methods("POST")
+	a.Router.HandleFunc("/table/{id:[0-9]+}", a.putTable).Methods("PUT")
+	//a.Router.HandleFunc("/table/{id:[0-9]+}", a.getTable).Methods("GET")
 }
 
 func (a *App) getTable(w http.ResponseWriter, r *http.Request) {
@@ -80,6 +82,36 @@ func (a *App) postTable(w http.ResponseWriter, r *http.Request) {
 	t.ID = 0
 	t.createTable(a.DB)
 	respondWithJSON(w, http.StatusCreated, t)
+}
+
+func (a *App) putTable(w http.ResponseWriter, r *http.Request) {
+	// Table id
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid table ID, must be int")
+		return
+	}
+	// Table object
+	var t table
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&t); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	if t.Places == 0 {
+		respondWithError(w, http.StatusBadRequest, "Places count should be more than 0")
+		return
+	}
+	defer r.Body.Close()
+	t.ID = id
+	// Check if id exists
+	err = t.updateTable(a.DB)
+	if err != nil {
+		respondWithError(w, http.StatusNotFound, err.Error())
+	} else {
+		respondWithJSON(w, http.StatusOK, t)
+	}
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {
