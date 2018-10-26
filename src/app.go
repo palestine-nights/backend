@@ -45,10 +45,10 @@ func (a *App) Server(port string) {
 }
 
 func (a *App) initializeRoutes() {
-	a.Router.HandleFunc("/table/{id:[0-9]+}", a.getTable).Methods("GET")
-	a.Router.HandleFunc("/table", a.postTable).Methods("POST")
-	a.Router.HandleFunc("/table/{id:[0-9]+}", a.putTable).Methods("PUT")
-	a.Router.HandleFunc("/table/{id:[0-9]+}", a.deleteTable).Methods("DELETE")
+	a.Router.HandleFunc("/tables/{id:[0-9]+}", a.getTable).Methods("GET")
+	a.Router.HandleFunc("/tables", a.postTable).Methods("POST")
+	a.Router.HandleFunc("/tables/{id:[0-9]+}", a.putTable).Methods("PUT")
+	a.Router.HandleFunc("/tables/{id:[0-9]+}", a.deleteTable).Methods("DELETE")
 	a.Router.HandleFunc("/tables", a.listTables).Methods("GET")
 }
 
