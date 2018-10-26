@@ -48,7 +48,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/table/{id:[0-9]+}", a.getTable).Methods("GET")
 	a.Router.HandleFunc("/table", a.postTable).Methods("POST")
 	a.Router.HandleFunc("/table/{id:[0-9]+}", a.putTable).Methods("PUT")
-	//a.Router.HandleFunc("/table/{id:[0-9]+}", a.getTable).Methods("GET")
+	a.Router.HandleFunc("/table/{id:[0-9]+}", a.deleteTable).Methods("DELETE")
 }
 
 func (a *App) getTable(w http.ResponseWriter, r *http.Request) {
@@ -111,6 +111,23 @@ func (a *App) putTable(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusNotFound, err.Error())
 	} else {
 		respondWithJSON(w, http.StatusOK, t)
+	}
+}
+
+func (a *App) deleteTable(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid table ID, must be int")
+		return
+	}
+	err = table.deleteTable(table{}, a.DB, id)
+	// Check if id exists
+	if err != nil {
+		respondWithError(w, http.StatusNotFound, err.Error())
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
 	}
 }
 

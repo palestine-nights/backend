@@ -162,6 +162,42 @@ func TestUpdateNotExistentTable(t *testing.T) {
 	}
 }
 
+// Create new, delete it, delete again (not existing id), check if exists
+func TestDelete(t *testing.T) {
+	// Create
+	places := 1 + rand.Int() % 10
+	desc := "description" + strconv.FormatInt(rand.Int63() % 100, 10)
+	str := fmt.Sprintf("{\"places\":%d,\"description\":\"%s\"}", places, desc)
+	payload := []byte(str)
+	req, _ := http.NewRequest("POST", "/table", bytes.NewBuffer(payload))
+	response := executeRequest(req)
+	checkResponseCode(t, http.StatusCreated, response.Code)
+	var t1 table
+	json.Unmarshal(response.Body.Bytes(), &t1)
+	if t1.Places != places {
+		t.Errorf("Expected 'places' to be %d. Got %d", places, t1.Places)
+	}
+	if t1.Description != desc {
+		t.Errorf("Expected 'description' to be %s. Got %s", desc, t1.Description)
+	}
+
+	// Delete
+	url := "/table/" + strconv.FormatInt(int64(t1.ID), 10)
+	req, _ = http.NewRequest("DELETE", url, bytes.NewBuffer(payload))
+	response = executeRequest(req)
+	checkResponseCode(t, http.StatusNoContent, response.Code)
+
+	// Delete again
+	req, _ = http.NewRequest("DELETE", url, bytes.NewBuffer(payload))
+	response = executeRequest(req)
+	checkResponseCode(t, http.StatusNotFound, response.Code)
+
+	// Check if exists
+	req, _ = http.NewRequest("GET", url, bytes.NewBuffer(payload))
+	response = executeRequest(req)
+	checkResponseCode(t, http.StatusNotFound, response.Code)
+}
+
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
 	a.Router.ServeHTTP(rr, req)

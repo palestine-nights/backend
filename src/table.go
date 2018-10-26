@@ -30,6 +30,15 @@ func (t *table) updateTable(db *gorm.DB) error {
 	return nil
 }
 
+func (table) deleteTable(db *gorm.DB, id int) error {
+	tbl := table.getTable(table{}, db, id)
+	if tbl.ID == 0 {
+		return errors.New("table with such id not found")
+	}
+	db.Delete(table{}, id)
+	return nil
+}
+
 func (table) TableName() string {
 	return "tables"
 }
