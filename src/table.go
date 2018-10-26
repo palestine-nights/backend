@@ -2,8 +2,11 @@ package main
 
 import (
 	"errors"
+
 	"github.com/jinzhu/gorm"
 )
+
+// @shal TODO: This should be fully refactored.
 
 type table struct {
 	ID          int    `json:"id" gorm:"primary_key"`

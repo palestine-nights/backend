@@ -250,7 +250,7 @@ func TestList(t *testing.T) {
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
-	a.Router.ServeHTTP(rr, req)
+	app.Router.ServeHTTP(rr, req)
 	return rr
 }
 func checkResponseCode(t *testing.T, expected, actual int) {

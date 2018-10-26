@@ -6,8 +6,10 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -33,18 +35,32 @@ func GetApp(user, password, database, host, port string) *App {
 	router := mux.NewRouter()
 	app := App{Router: router, DB: DB}
 
-	app.initializeRoutes()
+	app.initializeRouter()
 
 	return &app
 }
 
 // Server runs application server.
 func (app *App) Server(port string) {
+	allowedHeaders := handlers.AllowedHeaders([]string{"X-Requested-With"})
+	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
+	allowedMethods := handlers.AllowedMethods([]string{"GET", "PUT", "POST", "DELETE"})
+
+	handler := handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(app.Router)
+
+	server := http.Server{
+		Addr:         ":" + port,
+		Handler:      handler,
+		WriteTimeout: time.Second * 15,
+		ReadTimeout:  time.Second * 15,
+		IdleTimeout:  time.Second * 60,
+	}
+
 	log.Printf("Listening on port " + port)
-	log.Fatal(http.ListenAndServe(":"+port, app.Router))
+	log.Fatal(server.ListenAndServe())
 }
 
-func (app *App) initializeRoutes() {
+func (app *App) initializeRouter() {
 	app.Router.HandleFunc("/tables/{id:[0-9]+}", app.getTable).Methods("GET")
 	app.Router.HandleFunc("/tables/{id:[0-9]+}", app.putTable).Methods("PUT")
 	app.Router.HandleFunc("/tables/{id:[0-9]+}", app.deleteTable).Methods("DELETE")
@@ -54,74 +70,82 @@ func (app *App) initializeRoutes() {
 }
 
 func (app *App) listTables(w http.ResponseWriter, r *http.Request) {
-	t := table.getList(table{}, app.DB)
-	if t == nil {
+	table := table.getList(table{}, app.DB)
+	if table == nil {
 		respondWithError(w, http.StatusInternalServerError, "Error")
 	} else {
-		respondWithJSON(w, http.StatusOK, t)
+		respondWithJSON(w, http.StatusOK, table)
 	}
 }
 
 func (app *App) getTable(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+
 	id, err := strconv.Atoi(vars["id"])
+
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid table ID, must be int")
 		return
 	}
-	t := table.getTable(table{}, app.DB, id)
 
-	if t.ID == 0 {
+	table := table.getTable(table{}, app.DB, id)
+
+	if table.ID == 0 {
 		respondWithError(w, http.StatusNotFound, fmt.Sprintf("Table with id %d could not be found", id))
 		return
 	}
-	respondWithJSON(w, http.StatusOK, t)
+	respondWithJSON(w, http.StatusOK, table)
 }
 
 func (app *App) postTable(w http.ResponseWriter, r *http.Request) {
-	var t table
+	var table table
 	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&t); err != nil {
+	if err := decoder.Decode(&table); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	if t.Places == 0 {
+	if table.Places == 0 {
 		respondWithError(w, http.StatusBadRequest, "Places count should be more than 0")
 		return
 	}
 	defer r.Body.Close()
-	t.ID = 0
-	t.createTable(app.DB)
-	respondWithJSON(w, http.StatusCreated, t)
+	table.ID = 0
+	table.createTable(app.DB)
+	respondWithJSON(w, http.StatusCreated, table)
 }
 
 func (app *App) putTable(w http.ResponseWriter, r *http.Request) {
-	// Table id
 	vars := mux.Vars(r)
+
 	id, err := strconv.Atoi(vars["id"])
+
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid table ID, must be int")
 		return
 	}
-	// Table object
-	var t table
+
+	var table table
+
 	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&t); err != nil {
+	if err := decoder.Decode(&table); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	if t.Places == 0 {
+
+	if table.Places == 0 {
 		respondWithError(w, http.StatusBadRequest, "Places count should be more than 0")
 		return
 	}
 	defer r.Body.Close()
-	t.ID = id
-	// Check if id exists
-	err = t.updateTable(app.DB)
+
+	table.ID = id
+
+	// Check if id exists.
+	err = table.updateTable(app.DB)
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, err.Error())
 	} else {
-		respondWithJSON(w, http.StatusOK, t)
+		respondWithJSON(w, http.StatusOK, table)
 	}
 }
 
@@ -133,7 +157,8 @@ func (app *App) deleteTable(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = table.deleteTable(table{}, app.DB, id)
-	// Check if id exists
+
+	// Check if id exists.
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, err.Error())
 	} else {
