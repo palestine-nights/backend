@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-var a App
+var app App
 
 func TestMain(m *testing.M) {
 	databaseUser := getEnv("DATABASE_USER", "tours_admin")
@@ -22,9 +22,9 @@ func TestMain(m *testing.M) {
 	databaseHost := getEnv("DATABASE_HOST", "localhost")
 	databasePort := getEnv("DATABASE_PORT", "3306")
 
-	a = *GetApp(databaseUser, databasePassword, databaseName, databaseHost, databasePort)
-	a.DB.DropTable(table{})
-	a.DB.AutoMigrate(table{})
+	app = *GetApp(databaseUser, databasePassword, databaseName, databaseHost, databasePort)
+	app.DB.DropTable(table{})
+	app.DB.AutoMigrate(table{})
 	rand.Seed(time.Now().UnixNano())
 
 	code := m.Run()

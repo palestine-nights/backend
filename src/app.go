@@ -39,21 +39,22 @@ func GetApp(user, password, database, host, port string) *App {
 }
 
 // Server runs application server.
-func (a *App) Server(port string) {
+func (app *App) Server(port string) {
 	log.Printf("Listening on port " + port)
-	log.Fatal(http.ListenAndServe(":"+port, a.Router))
+	log.Fatal(http.ListenAndServe(":"+port, app.Router))
 }
 
-func (a *App) initializeRoutes() {
-	a.Router.HandleFunc("/tables/{id:[0-9]+}", a.getTable).Methods("GET")
-	a.Router.HandleFunc("/tables", a.postTable).Methods("POST")
-	a.Router.HandleFunc("/tables/{id:[0-9]+}", a.putTable).Methods("PUT")
-	a.Router.HandleFunc("/tables/{id:[0-9]+}", a.deleteTable).Methods("DELETE")
-	a.Router.HandleFunc("/tables", a.listTables).Methods("GET")
+func (app *App) initializeRoutes() {
+	app.Router.HandleFunc("/tables/{id:[0-9]+}", app.getTable).Methods("GET")
+	app.Router.HandleFunc("/tables/{id:[0-9]+}", app.putTable).Methods("PUT")
+	app.Router.HandleFunc("/tables/{id:[0-9]+}", app.deleteTable).Methods("DELETE")
+
+	app.Router.HandleFunc("/tables", app.postTable).Methods("POST")
+	app.Router.HandleFunc("/tables", app.listTables).Methods("GET")
 }
 
-func (a *App) listTables(w http.ResponseWriter, r *http.Request) {
-	t := table.getList(table{}, a.DB)
+func (app *App) listTables(w http.ResponseWriter, r *http.Request) {
+	t := table.getList(table{}, app.DB)
 	if t == nil {
 		respondWithError(w, http.StatusInternalServerError, "Error")
 	} else {
@@ -61,14 +62,14 @@ func (a *App) listTables(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a *App) getTable(w http.ResponseWriter, r *http.Request) {
+func (app *App) getTable(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid table ID, must be int")
 		return
 	}
-	t := table.getTable(table{}, a.DB, id)
+	t := table.getTable(table{}, app.DB, id)
 
 	if t.ID == 0 {
 		respondWithError(w, http.StatusNotFound, fmt.Sprintf("Table with id %d could not be found", id))
@@ -77,7 +78,7 @@ func (a *App) getTable(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, t)
 }
 
-func (a *App) postTable(w http.ResponseWriter, r *http.Request) {
+func (app *App) postTable(w http.ResponseWriter, r *http.Request) {
 	var t table
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&t); err != nil {
@@ -90,11 +91,11 @@ func (a *App) postTable(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 	t.ID = 0
-	t.createTable(a.DB)
+	t.createTable(app.DB)
 	respondWithJSON(w, http.StatusCreated, t)
 }
 
-func (a *App) putTable(w http.ResponseWriter, r *http.Request) {
+func (app *App) putTable(w http.ResponseWriter, r *http.Request) {
 	// Table id
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -116,7 +117,7 @@ func (a *App) putTable(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	t.ID = id
 	// Check if id exists
-	err = t.updateTable(a.DB)
+	err = t.updateTable(app.DB)
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, err.Error())
 	} else {
@@ -124,14 +125,14 @@ func (a *App) putTable(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a *App) deleteTable(w http.ResponseWriter, r *http.Request) {
+func (app *App) deleteTable(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid table ID, must be int")
 		return
 	}
-	err = table.deleteTable(table{}, a.DB, id)
+	err = table.deleteTable(table{}, app.DB, id)
 	// Check if id exists
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, err.Error())
