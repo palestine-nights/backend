@@ -21,5 +21,5 @@ func main() {
 		databaseHost,
 		databasePort,
 	)
-	server.Server(port)
+	server.ListenAndServe(port)
 }

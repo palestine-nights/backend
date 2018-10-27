@@ -46,7 +46,6 @@ func (Table) Destroy(db *gorm.DB, id int) error {
 	}
 
 	db.Delete(Table{}, id)
-	db.Delete(Table{}, "email LIKE ?", "%jinzhu%")
 
 	return nil
 }

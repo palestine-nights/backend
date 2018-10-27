@@ -36,15 +36,15 @@ func GetServer(user, password, database, host, port string) *Server {
 	return &server
 }
 
-// Server runs application server.
-func (app *Server) Server(port string) {
+// ListenAndServe server.
+func (server *Server) ListenAndServe(port string) {
 	allowedHeaders := handlers.AllowedHeaders([]string{"X-Requested-With"})
 	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
 	allowedMethods := handlers.AllowedMethods([]string{"GET", "PUT", "POST", "DELETE"})
 
-	handler := handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(app.Router)
+	handler := handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(server.Router)
 
-	server := http.Server{
+	httpServer := http.Server{
 		Addr:         ":" + port,
 		Handler:      handler,
 		WriteTimeout: time.Second * 15,
@@ -53,7 +53,7 @@ func (app *Server) Server(port string) {
 	}
 
 	log.Printf("Listening on port " + port)
-	log.Fatal(server.ListenAndServe())
+	log.Fatal(httpServer.ListenAndServe())
 }
 
 func (server *Server) initializeRouter() {
