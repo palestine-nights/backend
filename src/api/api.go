@@ -36,8 +36,8 @@ func GetServer(user, password, database, host, port string) *Server {
 	return &server
 }
 
-// Server runs application server.
-func (app *Server) Server(port string) {
+// ListenAndServe server.
+func (server *Server) ListenAndServe(port string) {
 	allowedHeaders := handlers.AllowedHeaders([]string{"X-Requested-With"})
 	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
 	allowedMethods := handlers.AllowedMethods([]string{"GET", "PUT", "POST", "DELETE"})
