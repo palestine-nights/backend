@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-var a App
+var app App
 
 func TestMain(m *testing.M) {
 	databaseUser := getEnv("DATABASE_USER", "tours_admin")
@@ -22,9 +22,9 @@ func TestMain(m *testing.M) {
 	databaseHost := getEnv("DATABASE_HOST", "localhost")
 	databasePort := getEnv("DATABASE_PORT", "3306")
 
-	a = *GetApp(databaseUser, databasePassword, databaseName, databaseHost, databasePort)
-	a.DB.DropTable(table{})
-	a.DB.AutoMigrate(table{})
+	app = *GetApp(databaseUser, databasePassword, databaseName, databaseHost, databasePort)
+	app.DB.DropTable(table{})
+	app.DB.AutoMigrate(table{})
 	rand.Seed(time.Now().UnixNano())
 
 	code := m.Run()
@@ -34,11 +34,11 @@ func TestMain(m *testing.M) {
 // Create table and check it's existence. Update 0 places, update OK, incorrect JSON
 func TestCreateUpdateTable(t *testing.T) {
 	// Create
-	places := 1 + rand.Int() % 10
-	desc := "description" + strconv.FormatInt(rand.Int63() % 100, 10)
+	places := 1 + rand.Int()%10
+	desc := "description" + strconv.FormatInt(rand.Int63()%100, 10)
 	str := fmt.Sprintf("{\"places\":%d,\"description\":\"%s\"}", places, desc)
 	payload := []byte(str)
-	req, _ := http.NewRequest("POST", "/table", bytes.NewBuffer(payload))
+	req, _ := http.NewRequest("POST", "/tables", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusCreated, response.Code)
 	var t1 table
@@ -51,7 +51,7 @@ func TestCreateUpdateTable(t *testing.T) {
 	}
 
 	// Update 0 places
-	url := "/table/" + strconv.FormatInt(int64(t1.ID), 10)
+	url := "/tables/" + strconv.FormatInt(int64(t1.ID), 10)
 	payload = []byte(`{"places":0,"description":"test update 0 places"}`)
 	req, _ = http.NewRequest("PUT", url, bytes.NewBuffer(payload))
 	response = executeRequest(req)
@@ -100,7 +100,7 @@ func TestCreateUpdateTable(t *testing.T) {
 }
 
 func TestGetNonExistentTable(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/table/0", nil)
+	req, _ := http.NewRequest("GET", "/tables/0", nil)
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusNotFound, response.Code)
 	var m map[string]string
@@ -113,7 +113,7 @@ func TestGetNonExistentTable(t *testing.T) {
 // Incorrect json (string instead of int)
 func TestCreateIncorrectFields(t *testing.T) {
 	payload := []byte(`{"places":"string","description":"d"}`)
-	req, _ := http.NewRequest("POST", "/table", bytes.NewBuffer(payload))
+	req, _ := http.NewRequest("POST", "/tables", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusBadRequest, response.Code)
 	var m map[string]string
@@ -126,7 +126,7 @@ func TestCreateIncorrectFields(t *testing.T) {
 // No 'places' field in request (also if places <= 0)
 func TestCreateNoPlaces(t *testing.T) {
 	payload := []byte(`{"description":"d"}`)
-	req, _ := http.NewRequest("POST", "/table", bytes.NewBuffer(payload))
+	req, _ := http.NewRequest("POST", "/tables", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusBadRequest, response.Code)
 	var m map[string]string
@@ -139,7 +139,7 @@ func TestCreateNoPlaces(t *testing.T) {
 // Create new table, even if id is set in payload
 func TestCreateWithExistingId(t *testing.T) {
 	payload := []byte(`{"id":1,"places":3,"description":"test creation"}`)
-	req, _ := http.NewRequest("POST", "/table", bytes.NewBuffer(payload))
+	req, _ := http.NewRequest("POST", "/tables", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusCreated, response.Code)
 	var t1 table
@@ -152,7 +152,7 @@ func TestCreateWithExistingId(t *testing.T) {
 // Update table with id that not exists
 func TestUpdateNotExistentTable(t *testing.T) {
 	payload := []byte(`{"places":3,"description":"test put"}`)
-	req, _ := http.NewRequest("PUT", "/table/500", bytes.NewBuffer(payload))
+	req, _ := http.NewRequest("PUT", "/tables/500", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusNotFound, response.Code)
 	var t1 table
@@ -165,11 +165,11 @@ func TestUpdateNotExistentTable(t *testing.T) {
 // Create new, delete it, delete again (not existing id), check if exists
 func TestDelete(t *testing.T) {
 	// Create
-	places := 1 + rand.Int() % 10
-	desc := "description" + strconv.FormatInt(rand.Int63() % 100, 10)
+	places := 1 + rand.Int()%10
+	desc := "description" + strconv.FormatInt(rand.Int63()%100, 10)
 	str := fmt.Sprintf("{\"places\":%d,\"description\":\"%s\"}", places, desc)
 	payload := []byte(str)
-	req, _ := http.NewRequest("POST", "/table", bytes.NewBuffer(payload))
+	req, _ := http.NewRequest("POST", "/tables", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusCreated, response.Code)
 	var t1 table
@@ -182,7 +182,7 @@ func TestDelete(t *testing.T) {
 	}
 
 	// Delete
-	url := "/table/" + strconv.FormatInt(int64(t1.ID), 10)
+	url := "/tables/" + strconv.FormatInt(int64(t1.ID), 10)
 	req, _ = http.NewRequest("DELETE", url, bytes.NewBuffer(payload))
 	response = executeRequest(req)
 	checkResponseCode(t, http.StatusNoContent, response.Code)
@@ -202,22 +202,22 @@ func TestDelete(t *testing.T) {
 func TestList(t *testing.T) {
 	// Create 2 tables
 	// 1
-	places1 := 1 + rand.Int() % 10
-	desc1 := "description" + strconv.FormatInt(rand.Int63() % 100, 10)
+	places1 := 1 + rand.Int()%10
+	desc1 := "description" + strconv.FormatInt(rand.Int63()%100, 10)
 	str := fmt.Sprintf("{\"places\":%d,\"description\":\"%s\"}", places1, desc1)
 	payload := []byte(str)
-	req, _ := http.NewRequest("POST", "/table", bytes.NewBuffer(payload))
+	req, _ := http.NewRequest("POST", "/tables", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusCreated, response.Code)
 	var t1 table
 	json.Unmarshal(response.Body.Bytes(), &t1)
 
 	// 2
-	places2 := 1 + rand.Int() % 10
-	desc2 := "description" + strconv.FormatInt(rand.Int63() % 100, 10)
+	places2 := 1 + rand.Int()%10
+	desc2 := "description" + strconv.FormatInt(rand.Int63()%100, 10)
 	str = fmt.Sprintf("{\"places\":%d,\"description\":\"%s\"}", places2, desc2)
 	payload = []byte(str)
-	req, _ = http.NewRequest("POST", "/table", bytes.NewBuffer(payload))
+	req, _ = http.NewRequest("POST", "/tables", bytes.NewBuffer(payload))
 	response = executeRequest(req)
 	checkResponseCode(t, http.StatusCreated, response.Code)
 	var t2 table
@@ -250,7 +250,7 @@ func TestList(t *testing.T) {
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
-	a.Router.ServeHTTP(rr, req)
+	app.Router.ServeHTTP(rr, req)
 	return rr
 }
 func checkResponseCode(t *testing.T, expected, actual int) {

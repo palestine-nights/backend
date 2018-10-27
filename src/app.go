@@ -6,20 +6,22 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-// App is structure with router and DB instanses.
+// App is structure with router and DB instances.
 type App struct {
 	Router *mux.Router
 	DB     *gorm.DB
 }
 
-// GetApp returns applocation instanses.
+// GetApp returns applocation instances.
 func GetApp(user, password, database, host, port string) *App {
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, database)
 
@@ -33,106 +35,130 @@ func GetApp(user, password, database, host, port string) *App {
 	router := mux.NewRouter()
 	app := App{Router: router, DB: DB}
 
-	app.initializeRoutes()
+	app.initializeRouter()
 
 	return &app
 }
 
 // Server runs application server.
-func (a *App) Server(port string) {
+func (app *App) Server(port string) {
+	allowedHeaders := handlers.AllowedHeaders([]string{"X-Requested-With"})
+	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
+	allowedMethods := handlers.AllowedMethods([]string{"GET", "PUT", "POST", "DELETE"})
+
+	handler := handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(app.Router)
+
+	server := http.Server{
+		Addr:         ":" + port,
+		Handler:      handler,
+		WriteTimeout: time.Second * 15,
+		ReadTimeout:  time.Second * 15,
+		IdleTimeout:  time.Second * 60,
+	}
+
 	log.Printf("Listening on port " + port)
-	log.Fatal(http.ListenAndServe(":"+port, a.Router))
+	log.Fatal(server.ListenAndServe())
 }
 
-func (a *App) initializeRoutes() {
-	a.Router.HandleFunc("/table/{id:[0-9]+}", a.getTable).Methods("GET")
-	a.Router.HandleFunc("/table", a.postTable).Methods("POST")
-	a.Router.HandleFunc("/table/{id:[0-9]+}", a.putTable).Methods("PUT")
-	a.Router.HandleFunc("/table/{id:[0-9]+}", a.deleteTable).Methods("DELETE")
-	a.Router.HandleFunc("/tables", a.listTables).Methods("GET")
+func (app *App) initializeRouter() {
+	app.Router.HandleFunc("/tables/{id:[0-9]+}", app.getTable).Methods("GET")
+	app.Router.HandleFunc("/tables/{id:[0-9]+}", app.putTable).Methods("PUT")
+	app.Router.HandleFunc("/tables/{id:[0-9]+}", app.deleteTable).Methods("DELETE")
+
+	app.Router.HandleFunc("/tables", app.postTable).Methods("POST")
+	app.Router.HandleFunc("/tables", app.listTables).Methods("GET")
 }
 
-func (a *App) listTables(w http.ResponseWriter, r *http.Request) {
-	t := table.getList(table{}, a.DB)
-	if t == nil {
+func (app *App) listTables(w http.ResponseWriter, r *http.Request) {
+	table := table.getList(table{}, app.DB)
+	if table == nil {
 		respondWithError(w, http.StatusInternalServerError, "Error")
 	} else {
-		respondWithJSON(w, http.StatusOK, t)
+		respondWithJSON(w, http.StatusOK, table)
 	}
 }
 
-func (a *App) getTable(w http.ResponseWriter, r *http.Request) {
+func (app *App) getTable(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+
 	id, err := strconv.Atoi(vars["id"])
+
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid table ID, must be int")
 		return
 	}
-	t := table.getTable(table{}, a.DB, id)
 
-	if t.ID == 0 {
+	table := table.getTable(table{}, app.DB, id)
+
+	if table.ID == 0 {
 		respondWithError(w, http.StatusNotFound, fmt.Sprintf("Table with id %d could not be found", id))
 		return
 	}
-	respondWithJSON(w, http.StatusOK, t)
+	respondWithJSON(w, http.StatusOK, table)
 }
 
-func (a *App) postTable(w http.ResponseWriter, r *http.Request) {
-	var t table
+func (app *App) postTable(w http.ResponseWriter, r *http.Request) {
+	var table table
 	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&t); err != nil {
+	if err := decoder.Decode(&table); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	if t.Places == 0 {
+	if table.Places == 0 {
 		respondWithError(w, http.StatusBadRequest, "Places count should be more than 0")
 		return
 	}
 	defer r.Body.Close()
-	t.ID = 0
-	t.createTable(a.DB)
-	respondWithJSON(w, http.StatusCreated, t)
+	table.ID = 0
+	table.createTable(app.DB)
+	respondWithJSON(w, http.StatusCreated, table)
 }
 
-func (a *App) putTable(w http.ResponseWriter, r *http.Request) {
-	// Table id
+func (app *App) putTable(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+
 	id, err := strconv.Atoi(vars["id"])
+
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid table ID, must be int")
 		return
 	}
-	// Table object
-	var t table
+
+	var table table
+
 	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&t); err != nil {
+	if err := decoder.Decode(&table); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	if t.Places == 0 {
+
+	if table.Places == 0 {
 		respondWithError(w, http.StatusBadRequest, "Places count should be more than 0")
 		return
 	}
 	defer r.Body.Close()
-	t.ID = id
-	// Check if id exists
-	err = t.updateTable(a.DB)
+
+	table.ID = id
+
+	// Check if id exists.
+	err = table.updateTable(app.DB)
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, err.Error())
 	} else {
-		respondWithJSON(w, http.StatusOK, t)
+		respondWithJSON(w, http.StatusOK, table)
 	}
 }
 
-func (a *App) deleteTable(w http.ResponseWriter, r *http.Request) {
+func (app *App) deleteTable(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid table ID, must be int")
 		return
 	}
-	err = table.deleteTable(table{}, a.DB, id)
-	// Check if id exists
+	err = table.deleteTable(table{}, app.DB, id)
+
+	// Check if id exists.
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, err.Error())
 	} else {
