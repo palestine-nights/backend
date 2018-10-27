@@ -11,20 +11,24 @@ import (
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/palestine-nights/backend/src/api"
+	"github.com/palestine-nights/backend/src/db"
+	"github.com/palestine-nights/backend/src/tools"
 )
 
-var app App
+var server api.Server
 
 func TestMain(m *testing.M) {
-	databaseUser := getEnv("DATABASE_USER", "tours_admin")
-	databasePassword := getEnv("DATABASE_PASSWORD", "ladmdetouris")
-	databaseName := getEnv("DATABASE_NAME", "restaurant")
-	databaseHost := getEnv("DATABASE_HOST", "localhost")
-	databasePort := getEnv("DATABASE_PORT", "3306")
+	databaseUser := tools.GetEnv("DATABASE_USER", "root")
+	databasePassword := tools.GetEnv("DATABASE_PASSWORD", "")
+	databaseName := tools.GetEnv("DATABASE_NAME", "restaurant")
+	databaseHost := tools.GetEnv("DATABASE_HOST", "localhost")
+	databasePort := tools.GetEnv("DATABASE_PORT", "3306")
 
-	app = *GetApp(databaseUser, databasePassword, databaseName, databaseHost, databasePort)
-	app.DB.DropTable(table{})
-	app.DB.AutoMigrate(table{})
+	server = *api.GetServer(databaseUser, databasePassword, databaseName, databaseHost, databasePort)
+	server.DB.DropTable(db.Table{})
+	server.DB.AutoMigrate(db.Table{})
 	rand.Seed(time.Now().UnixNano())
 
 	code := m.Run()
@@ -41,7 +45,7 @@ func TestCreateUpdateTable(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/tables", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusCreated, response.Code)
-	var t1 table
+	var t1 db.Table
 	json.Unmarshal(response.Body.Bytes(), &t1)
 	if t1.Places != places {
 		t.Errorf("Expected 'places' to be %d. Got %d", places, t1.Places)
@@ -61,7 +65,7 @@ func TestCreateUpdateTable(t *testing.T) {
 	req, _ = http.NewRequest("GET", url, nil)
 	response = executeRequest(req)
 	checkResponseCode(t, http.StatusOK, response.Code)
-	var t2 table
+	var t2 db.Table
 	json.Unmarshal(response.Body.Bytes(), &t2)
 	if t2.ID != t1.ID {
 		t.Errorf("Expected 'id' to be %d. Got %d", t1.ID, t2.ID)
@@ -78,7 +82,7 @@ func TestCreateUpdateTable(t *testing.T) {
 	req, _ = http.NewRequest("PUT", url, bytes.NewBuffer(payload))
 	response = executeRequest(req)
 	checkResponseCode(t, http.StatusOK, response.Code)
-	var t3 table
+	var t3 db.Table
 	json.Unmarshal(response.Body.Bytes(), &t3)
 	if t3.Places != 10 {
 		t.Errorf("Expected 'places' to be 10. Got %d", t3.Places)
@@ -142,7 +146,7 @@ func TestCreateWithExistingId(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/tables", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusCreated, response.Code)
-	var t1 table
+	var t1 db.Table
 	json.Unmarshal(response.Body.Bytes(), &t1)
 	if t1.ID == 1 {
 		t.Errorf("Expected 'id' to be not 1. Got %d", t1.ID)
@@ -155,7 +159,7 @@ func TestUpdateNotExistentTable(t *testing.T) {
 	req, _ := http.NewRequest("PUT", "/tables/500", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusNotFound, response.Code)
-	var t1 table
+	var t1 db.Table
 	json.Unmarshal(response.Body.Bytes(), &t1)
 	if t1.ID == 500 {
 		t.Errorf("Expected 'id' to be not 500. Got %d", t1.ID)
@@ -172,7 +176,7 @@ func TestDelete(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/tables", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusCreated, response.Code)
-	var t1 table
+	var t1 db.Table
 	json.Unmarshal(response.Body.Bytes(), &t1)
 	if t1.Places != places {
 		t.Errorf("Expected 'places' to be %d. Got %d", places, t1.Places)
@@ -209,7 +213,7 @@ func TestList(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/tables", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 	checkResponseCode(t, http.StatusCreated, response.Code)
-	var t1 table
+	var t1 db.Table
 	json.Unmarshal(response.Body.Bytes(), &t1)
 
 	// 2
@@ -220,14 +224,14 @@ func TestList(t *testing.T) {
 	req, _ = http.NewRequest("POST", "/tables", bytes.NewBuffer(payload))
 	response = executeRequest(req)
 	checkResponseCode(t, http.StatusCreated, response.Code)
-	var t2 table
+	var t2 db.Table
 	json.Unmarshal(response.Body.Bytes(), &t2)
 
 	// Get list
 	req, _ = http.NewRequest("GET", "/tables", bytes.NewBuffer(payload))
 	response = executeRequest(req)
 	checkResponseCode(t, http.StatusOK, response.Code)
-	var tables []table
+	var tables []db.Table
 	json.Unmarshal(response.Body.Bytes(), &tables)
 	// Check if created tables present
 	b1 := false
@@ -250,7 +254,7 @@ func TestList(t *testing.T) {
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
-	app.Router.ServeHTTP(rr, req)
+	server.Router.ServeHTTP(rr, req)
 	return rr
 }
 func checkResponseCode(t *testing.T, expected, actual int) {
