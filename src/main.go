@@ -1,14 +1,25 @@
 package main
 
+import (
+	"github.com/palestine-nights/backend/src/api"
+	"github.com/palestine-nights/backend/src/tools"
+)
+
 func main() {
-	databaseUser := getEnv("DATABASE_USER", "tours_admin")
-	databasePassword := getEnv("DATABASE_PASSWORD", "ladmdetouris")
-	databaseName := getEnv("DATABASE_NAME", "restaurant")
-	databaseHost := getEnv("DATABASE_HOST", "localhost")
-	databasePort := getEnv("DATABASE_NAME", "3306")
+	databaseUser := tools.GetEnv("DATABASE_USER", "root")
+	databasePassword := tools.GetEnv("DATABASE_PASSWORD", "")
+	databaseName := tools.GetEnv("DATABASE_NAME", "restaurant")
+	databaseHost := tools.GetEnv("DATABASE_HOST", "localhost")
+	databasePort := tools.GetEnv("DATABASE_NAME", "3306")
 
-	port := getEnv("PORT", "8080")
+	port := tools.GetEnv("PORT", "8080")
 
-	app := GetApp(databaseUser, databasePassword, databaseName, databaseHost, databasePort)
-	app.Server(port)
+	server := api.GetServer(
+		databaseUser,
+		databasePassword,
+		databaseName,
+		databaseHost,
+		databasePort,
+	)
+	server.Server(port)
 }

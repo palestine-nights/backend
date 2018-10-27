@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"encoding/json"
@@ -8,40 +8,36 @@ import (
 	"strconv"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql" //
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/mysql" //
+	"github.com/palestine-nights/backend/src/db"
 )
 
-// App is structure with router and DB instances.
-type App struct {
+// Server is composition of router and DB instances.
+type Server struct {
 	Router *mux.Router
 	DB     *gorm.DB
 }
 
-// GetApp returns applocation instances.
-func GetApp(user, password, database, host, port string) *App {
+// GetServer returns server instance.
+func GetServer(user, password, database, host, port string) *Server {
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, database)
 
-	DB, err := gorm.Open("mysql", connectionString)
-	DB.AutoMigrate(&table{})
-
-	if err != nil {
-		log.Fatal(err)
-	}
+	DB := db.Initialize(connectionString)
 
 	router := mux.NewRouter()
-	app := App{Router: router, DB: DB}
+	server := Server{Router: router, DB: DB}
 
-	app.initializeRouter()
+	server.initializeRouter()
 
-	return &app
+	return &server
 }
 
 // Server runs application server.
-func (app *App) Server(port string) {
+func (app *Server) Server(port string) {
 	allowedHeaders := handlers.AllowedHeaders([]string{"X-Requested-With"})
 	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
 	allowedMethods := handlers.AllowedMethods([]string{"GET", "PUT", "POST", "DELETE"})
@@ -60,17 +56,19 @@ func (app *App) Server(port string) {
 	log.Fatal(server.ListenAndServe())
 }
 
-func (app *App) initializeRouter() {
-	app.Router.HandleFunc("/tables/{id:[0-9]+}", app.getTable).Methods("GET")
-	app.Router.HandleFunc("/tables/{id:[0-9]+}", app.putTable).Methods("PUT")
-	app.Router.HandleFunc("/tables/{id:[0-9]+}", app.deleteTable).Methods("DELETE")
+func (server *Server) initializeRouter() {
+	tablesRouter := server.Router.PathPrefix("/tables").Subrouter()
 
-	app.Router.HandleFunc("/tables", app.postTable).Methods("POST")
-	app.Router.HandleFunc("/tables", app.listTables).Methods("GET")
+	tablesRouter.HandleFunc("", server.postTable).Methods("POST")
+	tablesRouter.HandleFunc("", server.listTables).Methods("GET")
+
+	tablesRouter.HandleFunc("/{id:[0-9]+}", server.getTable).Methods("GET")
+	tablesRouter.HandleFunc("/{id:[0-9]+}", server.putTable).Methods("PUT")
+	tablesRouter.HandleFunc("/{id:[0-9]+}", server.deleteTable).Methods("DELETE")
 }
 
-func (app *App) listTables(w http.ResponseWriter, r *http.Request) {
-	table := table.getList(table{}, app.DB)
+func (server *Server) listTables(w http.ResponseWriter, r *http.Request) {
+	table := db.Table.GetAll(db.Table{}, server.DB)
 	if table == nil {
 		respondWithError(w, http.StatusInternalServerError, "Error")
 	} else {
@@ -78,7 +76,7 @@ func (app *App) listTables(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *App) getTable(w http.ResponseWriter, r *http.Request) {
+func (server *Server) getTable(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	id, err := strconv.Atoi(vars["id"])
@@ -88,7 +86,7 @@ func (app *App) getTable(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	table := table.getTable(table{}, app.DB, id)
+	table := db.Table.Find(db.Table{}, server.DB, id)
 
 	if table.ID == 0 {
 		respondWithError(w, http.StatusNotFound, fmt.Sprintf("Table with id %d could not be found", id))
@@ -97,8 +95,8 @@ func (app *App) getTable(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, table)
 }
 
-func (app *App) postTable(w http.ResponseWriter, r *http.Request) {
-	var table table
+func (server *Server) postTable(w http.ResponseWriter, r *http.Request) {
+	var table db.Table
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&table); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
@@ -110,11 +108,11 @@ func (app *App) postTable(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 	table.ID = 0
-	table.createTable(app.DB)
+	table.Save(server.DB)
 	respondWithJSON(w, http.StatusCreated, table)
 }
 
-func (app *App) putTable(w http.ResponseWriter, r *http.Request) {
+func (server *Server) putTable(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	id, err := strconv.Atoi(vars["id"])
@@ -124,7 +122,7 @@ func (app *App) putTable(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var table table
+	var table db.Table
 
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&table); err != nil {
@@ -140,8 +138,8 @@ func (app *App) putTable(w http.ResponseWriter, r *http.Request) {
 
 	table.ID = id
 
-	// Check if id exists.
-	err = table.updateTable(app.DB)
+	// Check if ID exists.
+	err = table.Update(server.DB)
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, err.Error())
 	} else {
@@ -149,16 +147,16 @@ func (app *App) putTable(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *App) deleteTable(w http.ResponseWriter, r *http.Request) {
+func (server *Server) deleteTable(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid table ID, must be int")
 		return
 	}
-	err = table.deleteTable(table{}, app.DB, id)
+	err = db.Table.Destroy(db.Table{}, server.DB, id)
 
-	// Check if id exists.
+	// Check if ID exists.
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, err.Error())
 	} else {
@@ -170,6 +168,7 @@ func (app *App) deleteTable(w http.ResponseWriter, r *http.Request) {
 func respondWithError(w http.ResponseWriter, code int, message string) {
 	respondWithJSON(w, code, map[string]string{"error": message})
 }
+
 func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	response, _ := json.Marshal(payload)
 	w.Header().Set("Content-Type", "application/json")
