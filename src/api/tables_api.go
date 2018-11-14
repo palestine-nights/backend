@@ -42,17 +42,15 @@ func (server *Server) getTable(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) postTable(w http.ResponseWriter, r *http.Request) {
-	var table db.Table
+	table := db.Table{}
 	decoder := json.NewDecoder(r.Body)
 
-	fmt.Print(r.Body)
-
 	if err := decoder.Decode(&table); err != nil {
-		respondWithError(w, http.StatusBadRequest, err.Error())
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
 
-	// Validations:
+	// Validations
 	if table.Places <= 0 {
 		respondWithError(w, http.StatusBadRequest, "Places count should be more than 0")
 		return

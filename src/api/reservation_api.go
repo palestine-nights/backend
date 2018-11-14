@@ -11,23 +11,39 @@ import (
 	"github.com/palestine-nights/backend/src/db"
 )
 
+const (
+	statusCreated   = "created"
+	statusApproved  = "approved"
+	statusCancelled = "cancelled"
+)
+
 /* Table Reservations API */
 
 // Create reservation.
 func (server *Server) createReservation(w http.ResponseWriter, r *http.Request) {
-	var reservation db.Reservation
-
+	reservation := db.Reservation{}
 	decoder := json.NewDecoder(r.Body)
+
 	if err := decoder.Decode(&reservation); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
 
-	// Validation should be here. Email uniqueness, time uniqueness... etc.
-	// var reservations []db.Reservation
-	// sql := `SELECT * FROM reservations WHERE (created_at >= NOW() - INTERVAL 1 DAY) AND (email != :email OR phone != :phone)`
+	// Set default status "created" after creating.
+	reservation.Status = statusCreated
+	reservation.Duration *= time.Minute
 
-	// result, err := db.NamedExec(sql, reservation)
+	// Validate, that number of guests is more that 0.
+	if reservation.Guests <= 0 {
+		respondWithError(w, http.StatusBadRequest, "Ivalid number of guests, should more that 0")
+		return
+	}
+
+	// Validate, that duration between 1h to 3h.
+	if reservation.Duration < time.Hour || reservation.Duration > 3*time.Hour {
+		respondWithError(w, http.StatusBadRequest, "Invalid duration time, should be between 1 and 3")
+		return
+	}
 
 	isValid, err := reservation.Validate(server.DB)
 
@@ -36,22 +52,32 @@ func (server *Server) createReservation(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if isValid {
-		// Insert
-	} else {
-		respondWithError(w, http.StatusConflict, "email or phone was used for last 24 hours.")
+	// Validate, that reservation time is not earlier than current time.
+	if reservation.Time.Before(time.Now()) {
+		errorMesssage := fmt.Sprintf("Invalid reservation time")
+		respondWithError(w, http.StatusBadRequest, errorMesssage)
+		return
 	}
 
-	// TODO: Add validation on email (shouldn't be used at last 24h).
-	// TODO: Add validation on phone (shouldn't be used at last 24h).
-	// TODO: Check that this table at this time is free.
-	// TODO: Check that duration should be between 1h to 4h.
+	// Validate, that table with TableID exists.
+	if _, err = db.Table.Find(db.Table{}, server.DB, reservation.TableID); err != nil {
+		errorMesssage := fmt.Sprintf("Invalid table id %d", reservation.TableID)
+		respondWithError(w, http.StatusBadRequest, errorMesssage)
+		return
+	}
 
-	// Check if table is available.
+	if isValid {
+		err := reservation.Insert(server.DB)
+		// reservation :=
 
-	// defer r.Body.Close()
-
-	respondWithJSON(w, http.StatusCreated, reservation)
+		if err != nil {
+			respondWithError(w, http.StatusConflict, err.Error())
+		} else {
+			respondWithJSON(w, http.StatusOK, reservation)
+		}
+	} else {
+		respondWithError(w, http.StatusConflict, "Email or phone was already used for last 24 hours")
+	}
 }
 
 func (server *Server) getReservation(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +86,7 @@ func (server *Server) getReservation(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseUint(vars["id"], 10, 64)
 
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid reservation ID, must be int")
+		respondWithError(w, http.StatusBadRequest, "Invalid reservation ID, must be integer")
 		return
 	}
 
@@ -68,20 +94,21 @@ func (server *Server) getReservation(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, fmt.Sprintf("Reservation with id %d could not be found", id))
-		return
+	} else {
+		respondWithJSON(w, http.StatusOK, reservation)
 	}
-
-	respondWithJSON(w, http.StatusOK, reservation)
-}
-
-func (server *Server) getAllReservations(w http.ResponseWriter, r *http.Request) {
-	reservations, _ := db.Reservation.GetAll(db.Reservation{}, server.DB)
-
-	respondWithJSON(w, http.StatusOK, reservations)
 }
 
 func (server *Server) getReservations(w http.ResponseWriter, r *http.Request) {
-	reservations, _ := db.Reservation.Where(db.Reservation{}, server.DB, "time >= ?", time.Now)
+	getReservations := db.Reservation.GetAll
 
-	respondWithJSON(w, http.StatusOK, reservations)
+	if r.FormValue("upcoming") == "true" {
+		getReservations = db.Reservation.GetUpcoming
+	}
+
+	if reservations, err := getReservations(db.Reservation{}, server.DB); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	} else {
+		respondWithJSON(w, http.StatusOK, reservations)
+	}
 }

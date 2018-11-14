@@ -73,7 +73,6 @@ func (server *Server) initializeRouter() {
 
 	reservationRouter.HandleFunc("", server.createReservation).Methods("POST")
 	reservationRouter.HandleFunc("", server.getReservations).Methods("GET")
-	reservationRouter.HandleFunc("/all", server.getAllReservations).Methods("GET")
 
 	reservationRouter.HandleFunc("/{id:[0-9]+}", server.getReservation).Methods("GET")
 }

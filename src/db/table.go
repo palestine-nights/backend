@@ -1,33 +1,15 @@
 package db
 
 import (
-	"errors"
-	"strconv"
-	"time"
-
 	"github.com/jmoiron/sqlx"
 )
 
 // GetAll returns list of all tables.
 func (Table) GetAll(db *sqlx.DB) (*[]Table, error) {
-	var tables []Table
+	tables := make([]Table, 0)
 
-	rows, err := db.Queryx(`SELECT * FROM tables;`)
-
-	if err != nil {
+	if err := db.Select(&tables, `SELECT * FROM tables;`); err != nil {
 		return nil, err
-	}
-
-	for rows.Next() {
-		var table Table
-
-		err = rows.StructScan(&table)
-
-		if err != nil {
-			return nil, err
-		}
-
-		tables = append(tables, table)
 	}
 
 	return &tables, nil
@@ -37,10 +19,8 @@ func (Table) GetAll(db *sqlx.DB) (*[]Table, error) {
 func (Table) Find(db *sqlx.DB, id uint64) (*Table, error) {
 	table := Table{}
 
-	err := db.Get(&table, "SELECT * FROM tables WHERE id = ?", id)
-
-	if err != nil {
-		return nil, errors.New("cannot load table with id " + strconv.FormatUint(id, 16))
+	if err := db.Get(&table, "SELECT * FROM tables WHERE id = ?", id); err != nil {
+		return nil, err
 	}
 
 	return &table, nil
@@ -48,15 +28,12 @@ func (Table) Find(db *sqlx.DB, id uint64) (*Table, error) {
 
 // Destroy table with specified ID.
 func (Table) Destroy(db *sqlx.DB, id uint64) error {
-	_, err := Table.Find(Table{}, db, id)
 
-	if err != nil {
+	if _, err := Table.Find(Table{}, db, id); err != nil {
 		return err
 	}
 
-	_, err = db.Exec(`DELETE FROM tables WHERE id = ?;`, id)
-
-	if err != nil {
+	if _, err := db.Exec(`DELETE FROM tables WHERE id = ?;`, id); err != nil {
 		return err
 	}
 
@@ -65,13 +42,12 @@ func (Table) Destroy(db *sqlx.DB, id uint64) error {
 
 // Update table object in DB.
 func (table *Table) Update(db *sqlx.DB) error {
-	_, err := Table.Find(Table{}, db, table.ID)
 
-	if err != nil {
+	if _, err := Table.Find(Table{}, db, table.ID); err != nil {
 		return err
 	}
 
-	_, err = db.NamedExec(`UPDATE tables SET places=:places, description=:description WHERE id = id`, table)
+	_, err := db.NamedExec(`UPDATE tables SET places=:places, description=:description WHERE id = id`, table)
 
 	if err != nil {
 		return err
@@ -82,20 +58,24 @@ func (table *Table) Update(db *sqlx.DB) error {
 
 // Insert adds new table.
 func (table *Table) Insert(db *sqlx.DB) error {
-	sqlStatement := `INSERT INTO tables (places,description,created_at,updated_at) VALUES (?, ?, ?, ?);`
+	sqlStatement := `INSERT INTO tables (places,description) VALUES (?, ?);`
 
-	table.CreatedAt = time.Now()
-	table.UpdatedAt = time.Now()
+	result, err := db.Exec(sqlStatement, table.Places, table.Description)
 
-	result := db.MustExec(sqlStatement, table.Places, table.Description, time.Now(), time.Now())
-
+	if err != nil {
+		return err
+	}
 	id, err := result.LastInsertId()
 
 	if err != nil {
 		return err
 	}
 
-	table.ID = uint64(id)
+	table, err = Table.Find(Table{}, db, uint64(id))
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
