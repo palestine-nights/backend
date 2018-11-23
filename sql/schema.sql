@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS `tables` (
   id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	places      TINYINT UNSIGNED NOT NULL,
 	description VARCHAR(255) NOT NULL,
-  created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 ) ENGINE = InnoDB;
 
@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS `reservations` (
   guests       TINYINT UNSIGNED NOT NULL,
   email        VARCHAR(63) NOT NULL,
   phone        VARCHAR(63) NOT NULL,
-  status       ENUM('created', 'approved', 'cancelled') NOT NULL DEFAULT 'created',
-  fullname     VARCHAR(255) NOT NULL,
+  state        ENUM('created', 'approved', 'cancelled') NOT NULL DEFAULT 'created',
+  full_name    VARCHAR(255) NOT NULL,
   time         DATETIME NOT NULL,
   duration     BIGINT,
   created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

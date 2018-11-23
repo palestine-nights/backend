@@ -11,12 +11,6 @@ import (
 	"github.com/palestine-nights/backend/src/db"
 )
 
-const (
-	statusCreated   = "created"
-	statusApproved  = "approved"
-	statusCancelled = "cancelled"
-)
-
 /* Table Reservations API */
 
 // Create reservation.
@@ -29,13 +23,13 @@ func (server *Server) createReservation(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// Set default status "created" after creating.
-	reservation.Status = statusCreated
+	// Set default state "created" after creating.
+	reservation.State = db.StateCreated
 	reservation.Duration *= time.Minute
 
 	// Validate, that number of guests is more that 0.
 	if reservation.Guests <= 0 {
-		respondWithError(w, http.StatusBadRequest, "Ivalid number of guests, should more that 0")
+		respondWithError(w, http.StatusBadRequest, "Invalid number of guests, should be greater that 0")
 		return
 	}
 
@@ -54,21 +48,20 @@ func (server *Server) createReservation(w http.ResponseWriter, r *http.Request) 
 
 	// Validate, that reservation time is not earlier than current time.
 	if reservation.Time.Before(time.Now()) {
-		errorMesssage := fmt.Sprintf("Invalid reservation time")
-		respondWithError(w, http.StatusBadRequest, errorMesssage)
+		errorMessage := fmt.Sprintf("Invalid reservation time")
+		respondWithError(w, http.StatusBadRequest, errorMessage)
 		return
 	}
 
 	// Validate, that table with TableID exists.
 	if _, err = db.Table.Find(db.Table{}, server.DB, reservation.TableID); err != nil {
-		errorMesssage := fmt.Sprintf("Invalid table id %d", reservation.TableID)
-		respondWithError(w, http.StatusBadRequest, errorMesssage)
+		errorMessage := fmt.Sprintf("Invalid table id %d", reservation.TableID)
+		respondWithError(w, http.StatusBadRequest, errorMessage)
 		return
 	}
 
 	if isValid {
 		err := reservation.Insert(server.DB)
-		// reservation :=
 
 		if err != nil {
 			respondWithError(w, http.StatusConflict, err.Error())
@@ -76,7 +69,7 @@ func (server *Server) createReservation(w http.ResponseWriter, r *http.Request) 
 			respondWithJSON(w, http.StatusOK, reservation)
 		}
 	} else {
-		respondWithError(w, http.StatusConflict, "Email or phone was already used for last 24 hours")
+		respondWithError(w, http.StatusConflict, "Email or phone was already taken for last 24 hours")
 	}
 }
 

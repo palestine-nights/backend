@@ -1,14 +1,44 @@
 package db
 
 import (
+	"time"
+
 	"github.com/jmoiron/sqlx"
 )
 
-// Validate ...
-func (reservation *Reservation) Validate(db *sqlx.DB) (bool, error) {
-	// var reservations *[]Reservation
-	// var tableReserv ations *[]Reservation
+// GetStopTime calculates finish time of reservations.
+func (reservation *Reservation) GetStopTime() time.Time {
+	return reservation.Time.Add(reservation.Duration)
+}
 
+func isOverlap(start1, finish1, start2, finish2 time.Time) bool {
+	return start1.Before(finish2) && finish1.After(start2) &&
+		start1.Before(finish2) && start2.Before(finish1)
+}
+
+// Validates time to be not taken to create new table reservation record.
+func (reservation *Reservation) validateTime(db *sqlx.DB) (bool, error) {
+	// TODO: List only 'approved' records.
+	reservations := make([]Reservation, 0)
+
+	sql := `SELECT * FROM reservations;`
+
+	if err := db.Select(&reservations, sql); err != nil {
+		return false, err
+	}
+
+	for _, tmp := range reservations {
+		if isOverlap(reservation.Time, reservation.GetStopTime(), tmp.Time, tmp.GetStopTime()) {
+			return false, nil
+		}
+
+	}
+
+	return true, nil
+}
+
+// Validate validates all conditions to create new table reservation record.
+func (reservation *Reservation) Validate(db *sqlx.DB) (bool, error) {
 	reservations := make([]Reservation, 0)
 	tableReservations := make([]Reservation, 0)
 
@@ -26,27 +56,13 @@ func (reservation *Reservation) Validate(db *sqlx.DB) (bool, error) {
 		return false, err
 	}
 
-	// TODO: Finish logic for table reservation endpoint.
+	isValidTime, err := reservation.validateTime(db)
 
-	// newStartTime := reservation.Time
-	// newFinishTime := newStartTime.Add(reservation.Duration)
+	if err != nil {
+		return false, err
+	}
 
-	return isValid, nil
-
-	// for i, tableReservation := range tableReservations {
-	// 	reservationStartTime := tableReservation.Time
-	// 	reservationFinishTime := reservationStartTime.Add(tableReservation.Duration)
-
-	// 	if reservationStartTime.Before(newFinishTime) &&
-	// 		reservationFinishTime.After(newStartTime) &&
-	// 		reservationStartTime.Before(newFinishTime) &&
-	// 		newStartTime.Before(reservationFinishTime) {
-	// 		return false, nil
-	// 	}
-
-	// }
-
-	// return
+	return isValid && isValidTime, nil
 }
 
 // GetAll returns list of all reservations.
@@ -93,7 +109,7 @@ func (Reservation) Destroy(db *sqlx.DB, id uint64) error {
 
 // Insert adds new reservation.
 func (reservation *Reservation) Insert(db *sqlx.DB) error {
-	sql := `INSERT INTO reservations (table_id,guests,email,phone,fullname,time,duration) VALUES (?, ?, ?, ?, ?, ?, ?)`
+	sql := `INSERT INTO reservations (table_id,guests,email,phone,full_name,time,duration) VALUES (?, ?, ?, ?, ?, ?, ?)`
 
 	res, err := db.Exec(sql,
 		reservation.TableID,
