@@ -6,6 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/palestine-nights/backend/src/tools"
+	"github.com/ttacon/libphonenumber"
 )
 
 // GetStopTime calculates finish time of reservations.
@@ -19,24 +20,23 @@ func isOverlap(start1, finish1, start2, finish2 time.Time) bool {
 }
 
 // Validates time to be not taken to create new table reservation record.
-func (reservation *Reservation) validateTime(db *sqlx.DB) (bool, error) {
+func (reservation *Reservation) validateTime(db *sqlx.DB) error {
 	// TODO: List only 'approved' records.
 	reservations := make([]Reservation, 0)
 
-	sql := `SELECT * FROM reservations;`
+	sql := `SELECT * FROM reservations WHERE table_id = ?`
 
-	if err := db.Select(&reservations, sql); err != nil {
-		return false, err
+	if err := db.Select(&reservations, sql, reservation.TableID); err != nil {
+		return err
 	}
 
 	for _, tmp := range reservations {
 		if isOverlap(reservation.Time, reservation.GetStopTime(), tmp.Time, tmp.GetStopTime()) {
-			return false, nil
+			return errors.New("This time was already taken")
 		}
-
 	}
 
-	return true, nil
+	return nil
 }
 
 // Validate validates all conditions to create new table reservation record.
@@ -46,30 +46,30 @@ func (reservation *Reservation) Validate(db *sqlx.DB) (bool, error) {
 		return false, errors.New("Email is invalid")
 	}
 
-	reservations := make([]Reservation, 0)
-	tableReservations := make([]Reservation, 0)
+	// Validates and formats phone number.
+	phoneNumber, err := libphonenumber.Parse(reservation.Phone, "BH")
+	if err != nil || !libphonenumber.IsValidNumber(phoneNumber) {
+		return false, errors.New("Phone is invalid")
+	}
+	reservation.Phone = libphonenumber.Format(phoneNumber, libphonenumber.E164)
 
-	sql := `SELECT * FROM reservations WHERE (created_at >= NOW() - INTERVAL 1 DAY) AND (email != ? OR phone != ?);`
+	reservations := make([]Reservation, 0)
+
+	sql := `SELECT * FROM reservations WHERE (created_at >= NOW() - INTERVAL 1 DAY) AND (email = ? OR phone = ?);`
 
 	if err := db.Select(&reservations, sql, reservation.Email, reservation.Phone); err != nil {
 		return false, err
 	}
 
-	isValid := len(reservations) == 0
+	if len(reservations) != 0 {
+		return false, errors.New("Email or phone was already used for last 24 hours")
+	}
 
-	err := db.Select(&tableReservations, `SELECT * FROM reservations WHERE table_id = ?`, reservation.TableID)
-
-	if err != nil {
+	if err := reservation.validateTime(db); err != nil {
 		return false, err
 	}
 
-	isValidTime, err := reservation.validateTime(db)
-
-	if err != nil {
-		return false, err
-	}
-
-	return isValid && isValidTime, nil
+	return true, nil
 }
 
 // GetAll returns list of all reservations.
