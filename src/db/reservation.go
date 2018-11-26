@@ -1,9 +1,11 @@
 package db
 
 import (
+	"errors"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/palestine-nights/backend/src/tools"
 )
 
 // GetStopTime calculates finish time of reservations.
@@ -39,6 +41,11 @@ func (reservation *Reservation) validateTime(db *sqlx.DB) (bool, error) {
 
 // Validate validates all conditions to create new table reservation record.
 func (reservation *Reservation) Validate(db *sqlx.DB) (bool, error) {
+
+	if !tools.ValidateEmail(reservation.Email) {
+		return false, errors.New("Email is invalid")
+	}
+
 	reservations := make([]Reservation, 0)
 	tableReservations := make([]Reservation, 0)
 
