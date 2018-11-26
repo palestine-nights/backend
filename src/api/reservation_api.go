@@ -25,7 +25,6 @@ func (server *Server) createReservation(w http.ResponseWriter, r *http.Request) 
 
 	// Set default state "created" after creating.
 	reservation.State = db.StateCreated
-	reservation.Duration *= time.Minute
 
 	// Validate, that number of guests is more that 0.
 	if reservation.Guests <= 0 {
