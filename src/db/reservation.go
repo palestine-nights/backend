@@ -2,6 +2,7 @@ package db
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -41,7 +42,9 @@ func (reservation *Reservation) validateTime(db *sqlx.DB) error {
 
 // Validate validates all conditions to create new table reservation record.
 func (reservation *Reservation) Validate(db *sqlx.DB) (bool, error) {
+	reservations := make([]Reservation, 0)
 
+	// Validates email.
 	if !tools.ValidateEmail(reservation.Email) {
 		return false, errors.New("Email is invalid")
 	}
@@ -51,12 +54,10 @@ func (reservation *Reservation) Validate(db *sqlx.DB) (bool, error) {
 	if err != nil || !libphonenumber.IsValidNumber(phoneNumber) {
 		return false, errors.New("Phone is invalid")
 	}
+	// Formats phone number to E164 format.
 	reservation.Phone = libphonenumber.Format(phoneNumber, libphonenumber.E164)
 
-	reservations := make([]Reservation, 0)
-
 	sql := `SELECT * FROM reservations WHERE (created_at >= NOW() - INTERVAL 1 DAY) AND (email = ? OR phone = ?);`
-
 	if err := db.Select(&reservations, sql, reservation.Email, reservation.Phone); err != nil {
 		return false, err
 	}
@@ -67,6 +68,11 @@ func (reservation *Reservation) Validate(db *sqlx.DB) (bool, error) {
 
 	if err := reservation.validateTime(db); err != nil {
 		return false, err
+	}
+
+	reservation.FullName = strings.TrimSpace(reservation.FullName)
+	if len(reservation.FullName) == 0 {
+		return false, errors.New("Full Name is invalid")
 	}
 
 	return true, nil
