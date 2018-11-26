@@ -1,0 +1,9 @@
+.DS_Store
+.circleci
+.dockerignore
+.git
+.gitignore
+.idea
+Dockerfile
+LICENSE
+README.md
