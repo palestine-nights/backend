@@ -41,41 +41,40 @@ func (reservation *Reservation) validateTime(db *sqlx.DB) error {
 }
 
 // Validate validates all conditions to create new table reservation record.
-func (reservation *Reservation) Validate(db *sqlx.DB) (bool, error) {
-	reservations := make([]Reservation, 0)
-
+func (reservation *Reservation) Validate(db *sqlx.DB) error {
 	// Validates email.
 	if !tools.ValidateEmail(reservation.Email) {
-		return false, errors.New("Email is invalid")
+		return errors.New("Email is invalid")
 	}
 
 	// Validates and formats phone number.
 	phoneNumber, err := libphonenumber.Parse(reservation.Phone, "BH")
 	if err != nil || !libphonenumber.IsValidNumber(phoneNumber) {
-		return false, errors.New("Phone is invalid")
+		return errors.New("Phone is invalid")
 	}
 	// Formats phone number to E164 format.
 	reservation.Phone = libphonenumber.Format(phoneNumber, libphonenumber.E164)
 
-	sql := `SELECT * FROM reservations WHERE (created_at >= NOW() - INTERVAL 1 DAY) AND (email = ? OR phone = ?);`
-	if err := db.Select(&reservations, sql, reservation.Email, reservation.Phone); err != nil {
-		return false, err
-	}
-
-	if len(reservations) != 0 {
-		return false, errors.New("Email or phone was already used for last 24 hours")
-	}
+	// TODO: Use this validation, when SMS or email verification will be available to protect system.
+	// reservations := make([]Reservation, 0)
+	// sql := `SELECT * FROM reservations WHERE (created_at >= NOW() - INTERVAL 1 DAY) AND (email = ? OR phone = ?);`
+	// if err := db.Select(&reservations, sql, reservation.Email, reservation.Phone); err != nil {
+	// 	return err
+	// }
+	// if len(reservations) != 0 {
+	// 	return errors.New("Email or phone was already used for last 24 hours")
+	// }
 
 	if err := reservation.validateTime(db); err != nil {
-		return false, err
+		return err
 	}
 
 	reservation.FullName = strings.TrimSpace(reservation.FullName)
 	if len(reservation.FullName) == 0 {
-		return false, errors.New("Full Name is invalid")
+		return errors.New("Full Name is invalid")
 	}
 
-	return true, nil
+	return nil
 }
 
 // GetAll returns list of all reservations.
@@ -145,11 +144,10 @@ func (reservation *Reservation) Insert(db *sqlx.DB) error {
 	}
 
 	createdReservation, err := Reservation.Find(Reservation{}, db, uint64(id))
-	*reservation = *createdReservation
-
 	if err != nil {
 		return err
 	}
+	*reservation = *createdReservation
 
 	return nil
 }

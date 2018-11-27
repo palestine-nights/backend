@@ -71,11 +71,11 @@ func (table *Table) Insert(db *sqlx.DB) error {
 		return err
 	}
 
-	table, err = Table.Find(Table{}, db, uint64(id))
-
+	createdTable, err := Table.Find(Table{}, db, uint64(id))
 	if err != nil {
 		return err
 	}
+	*table = *createdTable
 
 	return nil
 }
