@@ -32,13 +32,17 @@ func (server *Server) createReservation(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// Validate, that duration between 1h to 3h.
-	if reservation.Duration < time.Hour || reservation.Duration > 3*time.Hour {
-		respondWithError(w, http.StatusBadRequest, "Invalid duration time, should be between 1 and 3")
+	// Validate, that duration between 1h to 6h.
+	if reservation.Duration < time.Hour {
+		respondWithError(w, http.StatusBadRequest, "Invalid duration time, should be more than "+time.Hour.String())
+		return
+	}
+	if reservation.Duration > 6*time.Hour {
+		respondWithError(w, http.StatusBadRequest, "Invalid duration time, should be less than "+(time.Hour*6).String())
 		return
 	}
 
-	isValid, err := reservation.Validate(server.DB)
+	err := reservation.Validate(server.DB)
 
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, err.Error())
@@ -53,22 +57,25 @@ func (server *Server) createReservation(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Validate, that table with TableID exists.
-	if _, err = db.Table.Find(db.Table{}, server.DB, reservation.TableID); err != nil {
+	table, err := db.Table.Find(db.Table{}, server.DB, reservation.TableID)
+	if err != nil {
 		errorMessage := fmt.Sprintf("Invalid table id %d", reservation.TableID)
 		respondWithError(w, http.StatusBadRequest, errorMessage)
 		return
 	}
+	// Validate, that number of guests not bigger that table has.
+	if reservation.Guests > table.Places {
+		errorMessage := fmt.Sprintf("Invalid amount of guests, maximum amount for this table is %d", table.Places)
+		respondWithError(w, http.StatusBadRequest, errorMessage)
+		return
+	}
 
-	if isValid {
-		err := reservation.Insert(server.DB)
+	err = reservation.Insert(server.DB)
 
-		if err != nil {
-			respondWithError(w, http.StatusConflict, err.Error())
-		} else {
-			respondWithJSON(w, http.StatusOK, reservation)
-		}
+	if err != nil {
+		respondWithError(w, http.StatusConflict, err.Error())
 	} else {
-		respondWithError(w, http.StatusConflict, "Email or phone was already taken for last 24 hours")
+		respondWithJSON(w, http.StatusOK, reservation)
 	}
 }
 
