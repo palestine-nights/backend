@@ -8,11 +8,11 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql" //
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	_ "github.com/jinzhu/gorm/dialects/mysql" //
 	"github.com/jmoiron/sqlx"
 	"github.com/palestine-nights/backend/src/db"
+	"github.com/rs/cors"
 )
 
 // Server is composition of router and DB instances.
@@ -38,15 +38,15 @@ func GetServer(user, password, database, host, port string) *Server {
 
 // ListenAndServe server.
 func (server *Server) ListenAndServe(port string) {
-	allowedHeaders := handlers.AllowedHeaders([]string{"X-Requested-With"})
-	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
-	allowedMethods := handlers.AllowedMethods([]string{"GET", "PUT", "POST", "DELETE"})
-
-	handler := handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(server.Router)
+	options := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "POST", "DELETE", "HEAD", "OPTIONS"},
+	})
 
 	httpServer := http.Server{
 		Addr:         ":" + port,
-		Handler:      handler,
+		Handler:      options.Handler(server.Router),
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
