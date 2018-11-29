@@ -22,6 +22,19 @@ func (server *Server) listMenu(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (server *Server) listMenuByCategory(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	category := vars["category"]
+
+	menu, err := db.MenuItem.GetByCategory(db.MenuItem{}, server.DB, category)
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+	} else {
+		respondWithJSON(w, http.StatusOK, menu)
+	}
+}
+
 func (server *Server) getMenuItem(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 

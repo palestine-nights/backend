@@ -85,4 +85,6 @@ func (server *Server) initializeRouter() {
 	menuRouter.HandleFunc("/{id:[0-9]+}", server.getMenuItem).Methods("GET")
 	menuRouter.HandleFunc("/{id:[0-9]+}", server.putMenuItem).Methods("PUT")
 	menuRouter.HandleFunc("/{id:[0-9]+}", server.deleteMenuItem).Methods("DELETE")
+
+	menuRouter.HandleFunc("/{category:[a-z|-]+}", server.listMenuByCategory).Methods("GET")
 }

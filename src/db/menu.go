@@ -15,6 +15,17 @@ func (MenuItem) GetAll(db *sqlx.DB) (*[]MenuItem, error) {
 	return &menuItems, nil
 }
 
+// GetByCategory returns list of all menu items in given category.
+func (MenuItem) GetByCategory(db *sqlx.DB, category string) (*[]MenuItem, error) {
+	menuItems := make([]MenuItem, 0)
+
+	if err := db.Select(&menuItems, `SELECT * FROM menu WHERE category = ?`, category); err != nil {
+		return nil, err
+	}
+
+	return &menuItems, nil
+}
+
 // Find returns MenuItem object with specified ID.
 func (MenuItem) Find(db *sqlx.DB, id uint64) (*MenuItem, error) {
 	menuItem := MenuItem{}
