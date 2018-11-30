@@ -36,6 +36,11 @@ func GetServer(user, password, database, host, port string) *Server {
 	return &server
 }
 
+func (server *Server) getHome(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "text/html")
+	http.ServeFile(w, r, "./html/home.html")
+}
+
 // ListenAndServe server.
 func (server *Server) ListenAndServe(port string) {
 	options := cors.New(cors.Options{
@@ -59,6 +64,10 @@ func (server *Server) ListenAndServe(port string) {
 func (server *Server) initializeRouter() {
 	tablesRouter := server.Router.PathPrefix("/tables").Subrouter()
 	reservationRouter := server.Router.PathPrefix("/reservations").Subrouter()
+
+	/* --- Homehandler --- */
+
+	server.Router.HandleFunc("/", server.getHome).Methods("GET")
 
 	/* --- Table endpoints --- */
 
