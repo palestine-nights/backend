@@ -4,7 +4,7 @@
 
 version: 2
 jobs:
-  test-lint-build:
+  test:
     docker:
       - image: circleci/golang:1.11
         environment:
@@ -57,9 +57,35 @@ jobs:
       - run:
           name: Compile source code
           command: "go build src/*.go"
+  push:
+    machine: true
+    steps:
+      - checkout
+      - run:
+          name: Login in Dockerhub
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - run:
+          name: Build docker image
+          command: |
+            docker build -t palestinenights/backend:$CIRCLE_BRANCH .
+            docker build -t palestinenights/backend:$(echo $CIRCLE_SHA1 | cut -c -7) .
+            docker build -t palestinenights/backend .
+      - run:
+          name: Push docker images
+          command: |
+            docker push palestinenights/backend:$CIRCLE_BRANCH
+            docker push palestinenights/backend:$(echo $CIRCLE_SHA1 | cut -c -7)
+            docker push palestinenights/backend
 
 workflows:
   version: 2
-  build:
+  test-build:
     jobs:
-      - test-lint-build
+      - test
+      - push:
+          requires:
+            - test
+          filters:
+            branches:
+              only: master
