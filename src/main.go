@@ -10,7 +10,7 @@ func main() {
 	databasePassword := tools.GetEnv("DATABASE_PASSWORD", "")
 	databaseName := tools.GetEnv("DATABASE_NAME", "restaurant")
 	databaseHost := tools.GetEnv("DATABASE_HOST", "localhost")
-	databasePort := tools.GetEnv("DATABASE_NAME", "3306")
+	databasePort := tools.GetEnv("DATABASE_PORT", "3306")
 
 	port := tools.GetEnv("PORT", "8080")
 
