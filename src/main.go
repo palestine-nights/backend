@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./api"
+	"github.com/palestine-nights/backend/src/api"
 	"github.com/palestine-nights/backend/src/tools"
 )
 

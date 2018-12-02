@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"../db"
+	"github.com/palestine-nights/backend/src/db"
 )
 
 /*  Menu API */

@@ -7,12 +7,13 @@ import (
 	"net/http"
 	"time"
 
-	"../db"
 	_ "github.com/go-sql-driver/mysql" //
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	_ "github.com/jinzhu/gorm/dialects/mysql" //
 	"github.com/jmoiron/sqlx"
+
+	"github.com/palestine-nights/backend/src/db"
 )
 
 // Server is composition of router and DB instances.
