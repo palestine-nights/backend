@@ -48,4 +48,5 @@ type MenuItem struct {
 	Description string  `json:"description" db:"description"`
 	Price       float32 `json:"price" db:"price"`
 	Category    string  `json:"category" db:"category"`
+	Photo       string  `json:"photo" db:"photo"`
 }
