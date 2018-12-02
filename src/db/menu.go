@@ -72,7 +72,7 @@ func (menuItem *MenuItem) Update(db *sqlx.DB) error {
 func (menuItem *MenuItem) Insert(db *sqlx.DB) error {
 	sqlStatement := `INSERT INTO menu (name, description, price, category, image_url) VALUES (?, ?, ?, ?, ?);`
 
-	result, err := db.Exec(sqlStatement, menuItem.Name, menuItem.Description, menuItem.Price, menuItem.Category, menuItem.ImageUrl)
+	result, err := db.Exec(sqlStatement, menuItem.Name, menuItem.Description, menuItem.Price, menuItem.Category, menuItem.ImageURL)
 
 	if err != nil {
 		return err

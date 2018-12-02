@@ -41,12 +41,12 @@ type Reservation struct {
 	UpdatedAt time.Time     `json:"-" db:"updated_at"`
 }
 
-// Menu item object for REST API.
+// MenuItem object for REST API.
 type MenuItem struct {
 	ID          uint64  `json:"id" db:"id"`
 	Name        string  `json:"name" db:"name"`
 	Description string  `json:"description" db:"description"`
 	Price       float32 `json:"price" db:"price"`
 	Category    string  `json:"category" db:"category"`
-	ImageUrl    string  `json:"image_url" db:"image_url"`
+	ImageURL    string  `json:"image_url" db:"image_url"`
 }
