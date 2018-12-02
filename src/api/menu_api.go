@@ -3,10 +3,10 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/palestine-nights/backend/src/db"
 )
 

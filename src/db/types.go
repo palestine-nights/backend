@@ -43,10 +43,12 @@ type Reservation struct {
 
 // MenuItem object for REST API.
 type MenuItem struct {
-	ID          uint64  `json:"id" db:"id"`
-	Name        string  `json:"name" db:"name"`
-	Description string  `json:"description" db:"description"`
-	Price       float32 `json:"price" db:"price"`
-	Category    string  `json:"category" db:"category"`
-	ImageURL    string  `json:"image_url" db:"image_url"`
+	ID          uint64    `json:"id" db:"id"`
+	Name        string    `json:"name" db:"name"`
+	Description string    `json:"description" db:"description"`
+	Price       float32   `json:"price" db:"price"`
+	Category    string    `json:"category" db:"category"`
+	ImageURL    string    `json:"image_url" db:"image_url"`
+	CreatedAt   time.Time `json:"-" db:"created_at"`
+	UpdatedAt   time.Time `json:"-" db:"updated_at"`
 }
