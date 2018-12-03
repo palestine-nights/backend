@@ -148,3 +148,14 @@ func (server *Server) deleteMenuItem(w http.ResponseWriter, r *http.Request) {
 		respondWithJSON(w, http.StatusNoContent, map[string]interface{}{})
 	}
 }
+
+func (server *Server) getAllCategories(w http.ResponseWriter, r *http.Request) {
+
+	categories, err := db.MenuItem.GetCategories(db.MenuItem{}, server.DB)
+
+	if err != nil {
+		respondWithError(w, http.StatusNotFound, err.Error())
+	} else {
+		respondWithJSON(w, http.StatusOK, categories)
+	}
+}
