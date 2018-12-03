@@ -92,6 +92,7 @@ func (menuItem *MenuItem) Insert(db *sqlx.DB) error {
 	return nil
 }
 
+// GetCategories returns list of unique menu categories.
 func (MenuItem) GetCategories(db *sqlx.DB) ([]string, error) {
 	categories := make([]string, 0)
 

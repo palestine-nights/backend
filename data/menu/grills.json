@@ -1,0 +1,32 @@
+{
+    "menu": [
+        {
+            "name": "Kebab",
+            "image_url": "https://www.palestinenights.com/photo-1.jpg",
+            "description": "",
+            "price": 3.000,
+            "category": "grills"
+        },
+        {
+            "name": "Sheesh Tawook",
+            "image_url": "https://www.palestinenights.com/photo-1.jpg",
+            "description": "",
+            "price": 3.000,
+            "category": "grills"
+        },
+        {
+            "name": "Half Grilled Chicken",
+            "image_url": "https://www.palestinenights.com/photo-1.jpg",
+            "description": "",
+            "price": 2.100,
+            "category": "grills"
+        },
+        {
+            "name": "Full Grilled Chicken",
+            "image_url": "https://www.palestinenights.com/photo-1.jpg",
+            "description": "",
+            "price": 3.900,
+            "category": "grills"
+        }
+    ]
+}
