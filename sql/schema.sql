@@ -3,6 +3,7 @@ USE `restaurant`;
 
 DROP TABLE IF EXISTS `reservations`;
 DROP TABLE IF EXISTS `tables`;
+DROP TABLE IF EXISTS `menu`;
 
 CREATE TABLE IF NOT EXISTS `tables` (
   id          INT UNSIGNED NOT NULL AUTO_INCREMENT,

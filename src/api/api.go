@@ -11,7 +11,6 @@ import (
 	"github.com/gorilla/mux"
 	_ "github.com/jinzhu/gorm/dialects/mysql" //
 	"github.com/jmoiron/sqlx"
-
 	"github.com/palestine-nights/backend/src/db"
 	"github.com/rs/cors"
 )
@@ -96,5 +95,9 @@ func (server *Server) initializeRouter() {
 	menuRouter.HandleFunc("/{id:[0-9]+}", server.putMenuItem).Methods("PUT")
 	menuRouter.HandleFunc("/{id:[0-9]+}", server.deleteMenuItem).Methods("DELETE")
 
+	menuRouter.HandleFunc("/categories", server.getAllCategories).Methods("GET")
+
+	// TODO: Add endpoint for categories.
+	// menuRouter.HandleFunc("/categories", server.getCategories).Methods("GET")
 	menuRouter.HandleFunc("/{category:[a-z|-]+}", server.listMenuByCategory).Methods("GET")
 }

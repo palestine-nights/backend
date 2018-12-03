@@ -91,3 +91,14 @@ func (menuItem *MenuItem) Insert(db *sqlx.DB) error {
 
 	return nil
 }
+
+// GetCategories returns list of unique menu categories.
+func (MenuItem) GetCategories(db *sqlx.DB) ([]string, error) {
+	categories := make([]string, 0)
+
+	if err := db.Select(&categories, `SELECT category FROM menu GROUP by category;`); err != nil {
+		return nil, err
+	}
+
+	return categories, nil
+}
