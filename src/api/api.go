@@ -46,7 +46,7 @@ func (server *Server) ListenAndServe(port string) {
 	options := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
-		AllowedMethods:   []string{"GET", "POST", "DELETE", "HEAD", "OPTIONS"},
+		AllowedMethods:   []string{"GET", "POST", "DELETE", "HEAD", "OPTIONS", "PUT"},
 	})
 
 	httpServer := http.Server{
