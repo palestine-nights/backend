@@ -81,10 +81,12 @@ func (server *Server) initializeRouter() {
 
 	/* --- Reservation endpoints --- */
 
-	reservationRouter.HandleFunc("", server.createReservation).Methods("POST")
+	reservationRouter.HandleFunc("", server.postReservation).Methods("POST")
 	reservationRouter.HandleFunc("", server.getReservations).Methods("GET")
 
 	reservationRouter.HandleFunc("/{id:[0-9]+}", server.getReservation).Methods("GET")
+	reservationRouter.HandleFunc("/{id:[0-9]+}", server.approveReservation).Methods("POST")
+	reservationRouter.HandleFunc("/{id:[0-9]+}", server.cancelReservation).Methods("POST")
 
 	/* --- Menu endpoints --- */
 
