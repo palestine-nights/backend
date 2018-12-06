@@ -1,8 +1,6 @@
 package db
 
-import (
-	"github.com/jmoiron/sqlx"
-)
+import "github.com/jmoiron/sqlx"
 
 // GetAll returns list of all menu items.
 func (MenuItem) GetAll(db *sqlx.DB) (*[]MenuItem, error) {

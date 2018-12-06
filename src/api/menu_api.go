@@ -10,8 +10,10 @@ import (
 	"github.com/palestine-nights/backend/src/db"
 )
 
-/*  Menu API */
-
+/// swagger:route GET /menu menu listMenu
+/// List all menu items.
+/// Responses:
+///   200: []MenuItem
 func (server *Server) listMenu(w http.ResponseWriter, r *http.Request) {
 	menu, err := db.MenuItem.GetAll(db.MenuItem{}, server.DB)
 
@@ -22,6 +24,10 @@ func (server *Server) listMenu(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/// swagger:route GET /menu/{category} menu listMenuByCategory
+/// List menu items with specified category.
+/// Responses:
+///   200: []MenuItem
 func (server *Server) listMenuByCategory(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	category := vars["category"]
@@ -35,6 +41,10 @@ func (server *Server) listMenuByCategory(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+/// swagger:route GET /menu/{id} menu getMenuItem
+/// Returns menu item.
+/// Responses:
+///   200: MenuItem
 func (server *Server) getMenuItem(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
@@ -54,6 +64,10 @@ func (server *Server) getMenuItem(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/// swagger:route POST /menu menu postMenuItem
+/// Create menu item.
+/// Responses:
+///   200: MenuItem
 func (server *Server) postMenuItem(w http.ResponseWriter, r *http.Request) {
 	menuItem := db.MenuItem{}
 	decoder := json.NewDecoder(r.Body)
@@ -88,6 +102,10 @@ func (server *Server) postMenuItem(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/// swagger:route PUT /menu/{id} menu putMenuItem
+/// Update menu item.
+/// Responses:
+///   200: MenuItem
 func (server *Server) putMenuItem(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
@@ -132,6 +150,10 @@ func (server *Server) putMenuItem(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/// swagger:route DELETE /menu/{id} menu deleteMenuItem
+/// Delete menu item.
+/// Responses:
+///   204:
 func (server *Server) deleteMenuItem(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.ParseUint(vars["id"], 10, 64)
@@ -149,6 +171,8 @@ func (server *Server) deleteMenuItem(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/// swagger:route GET /menu/categories menu getAllCategories
+/// List menu categories.
 func (server *Server) getAllCategories(w http.ResponseWriter, r *http.Request) {
 
 	categories, err := db.MenuItem.GetCategories(db.MenuItem{}, server.DB)

@@ -153,6 +153,7 @@ func (reservation *Reservation) Insert(db *sqlx.DB) error {
 	return nil
 }
 
+// Update puts new values for reservation row fields.
 func (reservation *Reservation) Update(db *sqlx.DB) error {
 	sql := `UPDATE reservations SET
 	(table_id = ?, guests = ?, email = ?, phone = ?, full_name = ?, time = ?, duration = ?)

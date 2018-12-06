@@ -1,20 +1,24 @@
 package db
 
-import (
-	"time"
-)
+import "time"
 
-// Table object for REST API.
+// Table represents restaurant table.
+//
+// swagger:parameters model
 type Table struct {
-	ID          uint64    `json:"id" db:"id"`
-	Places      int64     `json:"places" db:"places"`
+	ID uint64 `json:"id" db:"id"`
+	// Number of places to seat.
+	// required: true
+	Places int64 `json:"places" db:"places"`
+	// Description of the table.
+	// required: true
 	Description string    `json:"description" db:"description"`
 	CreatedAt   time.Time `json:"-" db:"created_at"`
 	UpdatedAt   time.Time `json:"-" db:"updated_at"`
 }
 
-// State is table reservation state.
-// Three possible states are availabe: 'created', 'approved', 'cancelled'.
+// State is string representation of reservation state.
+// swagger:strfmt state
 type State string
 
 const (
@@ -26,29 +30,57 @@ const (
 	StateCancelled State = "cancelled"
 )
 
-// Reservation object for REST API.
+// Reservation model for table reservation proccess.
+//
+// swagger:model
 type Reservation struct {
-	ID        uint64        `json:"id" db:"id"`
-	TableID   uint64        `json:"table_id" db:"table_id"`
-	Guests    int64         `json:"guests" db:"guests"`
-	Email     string        `json:"email" db:"email"`
-	Phone     string        `json:"phone" db:"phone"`
-	State     State         `json:"state" db:"state"`
-	FullName  string        `json:"full_name" db:"full_name"`
-	Time      time.Time     `json:"time" db:"time"`
+	ID uint64 `json:"id" db:"id"`
+	// ID of table, associated with reservation.
+	// required: true
+	TableID uint64 `json:"table_id" db:"table_id"`
+	// Number of people to seat for reservation.
+	// required: true
+	Guests int64 `json:"guests" db:"guests"`
+	// Email of the client.
+	// required: true
+	Email string `json:"email" db:"email"`
+	// Phone of the client.
+	// required: true
+	Phone string `json:"phone" db:"phone"`
+	State State  `json:"state" db:"state"`
+	// Full Name of the client.
+	// required: true
+	FullName string `json:"full_name" db:"full_name"`
+	// Time of the reservation.
+	// required: true
+	Time time.Time `json:"time" db:"time"`
+	// Duration of the reservation.
+	// required: truee
 	Duration  time.Duration `json:"duration" db:"duration"`
 	CreatedAt time.Time     `json:"-" db:"created_at"`
 	UpdatedAt time.Time     `json:"-" db:"updated_at"`
 }
 
-// MenuItem object for REST API.
+// MenuItem model for menu.
+//
+// swagger:model
 type MenuItem struct {
-	ID          uint64    `json:"id" db:"id"`
-	Name        string    `json:"name" db:"name"`
-	Description string    `json:"description" db:"description"`
-	Price       float32   `json:"price" db:"price"`
-	Category    string    `json:"category" db:"category"`
-	ImageURL    string    `json:"image_url" db:"image_url"`
-	CreatedAt   time.Time `json:"-" db:"created_at"`
-	UpdatedAt   time.Time `json:"-" db:"updated_at"`
+	ID uint64 `json:"id" db:"id"`
+	// Name of the menu item.
+	// required: true
+	Name string `json:"name" db:"name"`
+	// Description of the menu item.
+	// required: true
+	Description string `json:"description" db:"description"`
+	// Price of the menu item in Bahrain Dinars.
+	// required: true
+	Price float32 `json:"price" db:"price"`
+	// Category of the menu item.
+	// required: true
+	Category string `json:"category" db:"category"`
+	// Image URL for the menu item.
+	// required: true
+	ImageURL  string    `json:"image_url" db:"image_url"`
+	CreatedAt time.Time `json:"-" db:"created_at"`
+	UpdatedAt time.Time `json:"-" db:"updated_at"`
 }

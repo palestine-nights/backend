@@ -13,7 +13,10 @@ import (
 
 /* Table Reservations API */
 
-// Create reservation.
+/// swagger:route POST /reservations reservations postReservation
+/// Creates reservation.
+/// Responses:
+///   200: Reservation
 func (server *Server) postReservation(w http.ResponseWriter, r *http.Request) {
 	reservation := db.Reservation{}
 	decoder := json.NewDecoder(r.Body)
@@ -79,6 +82,10 @@ func (server *Server) postReservation(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/// swagger:route GET /reservations/{id} reservations getReservation
+/// Returns reservation.
+/// Responses:
+///   200: Reservation
 func (server *Server) getReservation(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
@@ -98,6 +105,10 @@ func (server *Server) getReservation(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/// swagger:route GET /reservations/{id} reservations getReservations
+/// Returns reservation.
+/// Responses:
+///   200: []Reservation
 func (server *Server) getReservations(w http.ResponseWriter, r *http.Request) {
 	getReservations := db.Reservation.GetAll
 
@@ -135,13 +146,22 @@ func (server *Server) updateReservationState(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		respondWithError(w, http.StatusConflict, err.Error())
 	} else {
-		respondWithJSON(w, http.StatusOK, reservation)
+		respondWithJSON(w, http.StatusOK, reservation.State)
 	}
 }
 
+/// swagger:route POST /reservations/{id} reservations approveReservation
+/// Approve reservation.
+/// Responses:
+///   200: State
 func (server *Server) approveReservation(w http.ResponseWriter, r *http.Request) {
 	server.updateReservationState(w, r, db.StateApproved)
 }
+
+/// swagger:route POST /reservations/{id} reservations cancelReservation
+/// Cancel reservation.
+/// Responses:
+///   200: State
 func (server *Server) cancelReservation(w http.ResponseWriter, r *http.Request) {
 	server.updateReservationState(w, r, db.StateCancelled)
 }

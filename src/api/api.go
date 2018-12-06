@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,7 +16,16 @@ import (
 	"github.com/rs/cors"
 )
 
+// GenericError error model.
+//
+// swagger:model
+type GenericError struct {
+	// Error massage.
+	Error string `json:"error"`
+}
+
 // Server is composition of router and DB instances.
+// swagger:ignore
 type Server struct {
 	Router *mux.Router
 	DB     *sqlx.DB
@@ -102,4 +112,15 @@ func (server *Server) initializeRouter() {
 	// TODO: Add endpoint for categories.
 	// menuRouter.HandleFunc("/categories", server.getCategories).Methods("GET")
 	menuRouter.HandleFunc("/{category:[a-z|-]+}", server.listMenuByCategory).Methods("GET")
+}
+
+func respondWithError(w http.ResponseWriter, code int, message string) {
+	respondWithJSON(w, code, GenericError{Error: message})
+}
+
+func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+	response, _ := json.Marshal(payload)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(response)
 }
