@@ -147,7 +147,40 @@ func (reservation *Reservation) Insert(db *sqlx.DB) error {
 	if err != nil {
 		return err
 	}
+
 	*reservation = *createdReservation
+
+	return nil
+}
+
+// Update puts new values for reservation row fields.
+func (reservation *Reservation) Update(db *sqlx.DB) error {
+	sql := `UPDATE reservations SET
+	(table_id = ?, guests = ?, email = ?, phone = ?, full_name = ?, time = ?, duration = ?)
+	WHERE id = ?`
+
+	_, err := db.Exec(sql,
+		reservation.TableID,
+		reservation.Guests,
+		reservation.Email,
+		reservation.Phone,
+		reservation.FullName,
+		reservation.Time,
+		reservation.Duration,
+		reservation.ID,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	updatedReservation, err := Reservation.Find(Reservation{}, db, uint64(reservation.ID))
+
+	if err != nil {
+		return err
+	}
+
+	*reservation = *updatedReservation
 
 	return nil
 }

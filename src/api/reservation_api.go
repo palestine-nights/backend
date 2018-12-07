@@ -13,8 +13,11 @@ import (
 
 /* Table Reservations API */
 
-// Create reservation.
-func (server *Server) createReservation(w http.ResponseWriter, r *http.Request) {
+/// swagger:route POST /reservations reservations postReservation
+/// Creates reservation.
+/// Responses:
+///   200: Reservation
+func (server *Server) postReservation(w http.ResponseWriter, r *http.Request) {
 	reservation := db.Reservation{}
 	decoder := json.NewDecoder(r.Body)
 
@@ -79,6 +82,10 @@ func (server *Server) createReservation(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
+/// swagger:route GET /reservations/{id} reservations getReservation
+/// Returns reservation.
+/// Responses:
+///   200: Reservation
 func (server *Server) getReservation(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
@@ -98,6 +105,10 @@ func (server *Server) getReservation(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/// swagger:route GET /reservations/{id} reservations getReservations
+/// Returns reservation.
+/// Responses:
+///   200: []Reservation
 func (server *Server) getReservations(w http.ResponseWriter, r *http.Request) {
 	getReservations := db.Reservation.GetAll
 
@@ -110,4 +121,47 @@ func (server *Server) getReservations(w http.ResponseWriter, r *http.Request) {
 	} else {
 		respondWithJSON(w, http.StatusOK, reservations)
 	}
+}
+
+func (server *Server) updateReservationState(w http.ResponseWriter, r *http.Request, state db.State) {
+	vars := mux.Vars(r)
+
+	id, err := strconv.ParseUint(vars["id"], 10, 64)
+
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid reservation ID, must be integer")
+		return
+	}
+
+	reservation, err := db.Reservation.Find(db.Reservation{}, server.DB, uint64(id))
+	reservation.State = state
+
+	err = reservation.Update(server.DB)
+
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid reservation ID, must be integer")
+		return
+	}
+
+	if err != nil {
+		respondWithError(w, http.StatusConflict, err.Error())
+	} else {
+		respondWithJSON(w, http.StatusOK, reservation.State)
+	}
+}
+
+/// swagger:route POST /reservations/{id} reservations approveReservation
+/// Approve reservation.
+/// Responses:
+///   200: State
+func (server *Server) approveReservation(w http.ResponseWriter, r *http.Request) {
+	server.updateReservationState(w, r, db.StateApproved)
+}
+
+/// swagger:route POST /reservations/{id} reservations cancelReservation
+/// Cancel reservation.
+/// Responses:
+///   200: State
+func (server *Server) cancelReservation(w http.ResponseWriter, r *http.Request) {
+	server.updateReservationState(w, r, db.StateCancelled)
 }
