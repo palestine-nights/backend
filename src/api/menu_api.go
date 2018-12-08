@@ -31,13 +31,13 @@ func (server *Server) listMenu(w http.ResponseWriter, r *http.Request) {
 func (server *Server) listMenuByCategory(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	categoryId, err := strconv.ParseUint(vars["category_id"], 10, 64)
+	categoryID, err := strconv.ParseUint(vars["category_id"], 10, 64)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid menu category ID, must be int")
 		return
 	}
 
-	menu, err := db.MenuItem.GetByCategory(db.MenuItem{}, server.DB, categoryId)
+	menu, err := db.MenuItem.GetByCategory(db.MenuItem{}, server.DB, categoryID)
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())

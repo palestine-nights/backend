@@ -14,10 +14,10 @@ func (MenuItem) GetAll(db *sqlx.DB) (*[]MenuItem, error) {
 }
 
 // GetByCategory returns list of all menu items in given category.
-func (MenuItem) GetByCategory(db *sqlx.DB, categoryId uint64) (*[]MenuItem, error) {
+func (MenuItem) GetByCategory(db *sqlx.DB, categoryID uint64) (*[]MenuItem, error) {
 	menuItems := make([]MenuItem, 0)
 
-	if err := db.Select(&menuItems, `SELECT * FROM menu WHERE category_id = ?`, categoryId); err != nil {
+	if err := db.Select(&menuItems, `SELECT * FROM menu WHERE category_id = ?`, categoryID); err != nil {
 		return nil, err
 	}
 
