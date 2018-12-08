@@ -30,9 +30,14 @@ func (server *Server) listMenu(w http.ResponseWriter, r *http.Request) {
 ///   200: []MenuItem
 func (server *Server) listMenuByCategory(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	category := vars["category"]
 
-	menu, err := db.MenuItem.GetByCategory(db.MenuItem{}, server.DB, category)
+	categoryId, err := strconv.ParseUint(vars["category_id"], 10, 64)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid menu category ID, must be int")
+		return
+	}
+
+	menu, err := db.MenuItem.GetByCategory(db.MenuItem{}, server.DB, categoryId)
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -82,8 +87,8 @@ func (server *Server) postMenuItem(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Name should not be empty")
 		return
 	}
-	if len(menuItem.Category) == 0 {
-		respondWithError(w, http.StatusBadRequest, "Category should not be empty")
+	if _, err := db.MenuCategory.Find(db.MenuCategory{}, server.DB, menuItem.CategoryID); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Category with such id does not exist")
 		return
 	}
 	if menuItem.Price <= 0 {
@@ -129,8 +134,8 @@ func (server *Server) putMenuItem(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Name should not be empty")
 		return
 	}
-	if len(menuItem.Category) == 0 {
-		respondWithError(w, http.StatusBadRequest, "Category should not be empty")
+	if _, err := db.MenuCategory.Find(db.MenuCategory{}, server.DB, menuItem.CategoryID); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Category with such id does not exist")
 		return
 	}
 	if menuItem.Price <= 0 {
@@ -174,12 +179,42 @@ func (server *Server) deleteMenuItem(w http.ResponseWriter, r *http.Request) {
 /// swagger:route GET /menu/categories menu getAllCategories
 /// List menu categories.
 func (server *Server) getAllCategories(w http.ResponseWriter, r *http.Request) {
-
-	categories, err := db.MenuItem.GetCategories(db.MenuItem{}, server.DB)
+	categories, err := db.MenuCategory.GetAll(db.MenuCategory{}, server.DB)
 
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, err.Error())
 	} else {
 		respondWithJSON(w, http.StatusOK, categories)
+	}
+}
+
+/// swagger:route PUT /menu/categories menu updateCategory
+/// Update menu category.
+func (server *Server) updateCategory(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	id, err := strconv.ParseUint(vars["id"], 10, 64)
+
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid menu category ID, must be int")
+		return
+	}
+
+	var category db.MenuCategory
+
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&category); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+
+	category.ID = id
+
+	// Check if ID exists.
+	err = category.Update(server.DB)
+	if err != nil {
+		respondWithError(w, http.StatusNotFound, err.Error())
+	} else {
+		respondWithJSON(w, http.StatusOK, category)
 	}
 }

@@ -108,10 +108,9 @@ func (server *Server) initializeRouter() {
 	menuRouter.HandleFunc("/{id:[0-9]+}", server.deleteMenuItem).Methods("DELETE")
 
 	menuRouter.HandleFunc("/categories", server.getAllCategories).Methods("GET")
+	menuRouter.HandleFunc("/categories/{id:[0-9]+}", server.updateCategory).Methods("PUT")
 
-	// TODO: Add endpoint for categories.
-	// menuRouter.HandleFunc("/categories", server.getCategories).Methods("GET")
-	menuRouter.HandleFunc("/{category:[a-z|-]+}", server.listMenuByCategory).Methods("GET")
+	menuRouter.HandleFunc("/category/{category_id:[0-9]+}", server.listMenuByCategory).Methods("GET")
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {
