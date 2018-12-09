@@ -11,6 +11,10 @@ import (
 	"github.com/palestine-nights/backend/src/tools"
 )
 
+type Token struct {
+	Token string `json:"token"`
+}
+
 func (server *Server) authenticateUser(c *gin.Context) {
 	requestedUser := db.User{}
 
@@ -43,11 +47,12 @@ func (server *Server) authenticateUser(c *gin.Context) {
 
 	// Get token string
 	tokenString, err := token.SignedString(signingKey)
+	tokenObj := Token{Token: tokenString}
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 	} else {
-		c.JSON(http.StatusOK, tokenString)
+		c.JSON(http.StatusOK, tokenObj)
 	}
 }
 
