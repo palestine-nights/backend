@@ -28,6 +28,31 @@ func (MenuCategory) Find(db *sqlx.DB, id uint64) (*MenuCategory, error) {
 	return &category, nil
 }
 
+// Insert adds new category.
+func (menuCategory *MenuCategory) Insert(db *sqlx.DB) error {
+	sqlStatement := "INSERT INTO categories (name, `order`) VALUES (?, ?);"
+
+	result, err := db.Exec(sqlStatement, menuCategory.Name, menuCategory.Order)
+
+	if err != nil {
+		return err
+	}
+
+	id, err := result.LastInsertId()
+
+	if err != nil {
+		return err
+	}
+
+	createdCategory, err := MenuCategory.Find(MenuCategory{}, db, uint64(id))
+	if err != nil {
+		return err
+	}
+	*menuCategory = *createdCategory
+
+	return nil
+}
+
 // Update menu category object in DB.
 func (menuCategory *MenuCategory) Update(db *sqlx.DB) error {
 

@@ -3,20 +3,20 @@
 ##### ***GET***
 **Summary:** List menu categories.
 
-**Description:** 400:
+**Description:** 400: []MenuCategory
 404: GenericError
 
-### /categories/{category}
+### /categories/{id}
 ---
-##### ***GET***
-**Summary:** List menu items with specified category.
+##### ***PUT***
+**Summary:** Update menu category.
 
 **Responses**
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 200 | MenuItem | [ [MenuItem](#menuitem) ] |
-| 500 | GenericError | [GenericError](#genericerror) |
+| 200 | MenuCategory | [MenuCategory](#menucategory) |
+| 400 | GenericError | [GenericError](#genericerror) |
 
 ### /menu
 ---
@@ -39,6 +39,18 @@
 | ---- | ----------- | ------ |
 | 201 | MenuItem | [MenuItem](#menuitem) |
 | 400 | GenericError | [GenericError](#genericerror) |
+
+### /menu/categories/{category_id}
+---
+##### ***GET***
+**Summary:** List menu items with specified category.
+
+**Responses**
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | MenuItem | [ [MenuItem](#menuitem) ] |
+| 500 | GenericError | [GenericError](#genericerror) |
 
 ### /menu/{id}
 ---
@@ -179,7 +191,7 @@
 ### Models
 ---
 
-### Duration
+### Duration  
 
 A Duration represents the elapsed time between two instants
 as an int64 nanosecond count. The representation limits the
@@ -191,24 +203,32 @@ largest representable duration to approximately 290 years.
 as an int64 nanosecond count. The representation limits the
 largest representable duration to approximately 290 years. |  |
 
-### GenericError
+### GenericError  
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | error | string | Error massage. | No |
 
-### MenuItem
+### MenuCategory  
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| category | string | Category of the menu item. | Yes |
+| id | integer (uint64) |  | No |
+| name | string | Name of the menu category. | Yes |
+| order | integer (uint64) | Order of this category in categories list. | Yes |
+
+### MenuItem  
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| category_id | integer (uint64) | Category of the menu item. | Yes |
 | description | string | Description of the menu item. | Yes |
 | id | integer (uint64) |  | No |
 | image_url | string | Image URL for the menu item. | Yes |
 | name | string | Name of the menu item. | Yes |
 | price | float | Price of the menu item in Bahrain Dinars. | Yes |
 
-### Reservation
+### Reservation  
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
@@ -222,13 +242,13 @@ largest representable duration to approximately 290 years. |  |
 | table_id | integer (uint64) | ID of table, associated with reservation. | Yes |
 | time | dateTime | Time of the reservation. | Yes |
 
-### State
+### State  
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | State | string |  |  |
 
-### Table
+### Table  
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |

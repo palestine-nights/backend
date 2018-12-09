@@ -94,7 +94,7 @@ func (menuItem *MenuItem) Insert(db *sqlx.DB) error {
 func (MenuItem) GetCategories(db *sqlx.DB) ([]string, error) {
 	categories := make([]string, 0)
 
-	if err := db.Select(&categories, `SELECT category FROM menu GROUP by category;`); err != nil {
+	if err := db.Select(&categories, `SELECT id, name, order FROM categories;`); err != nil {
 		return nil, err
 	}
 
