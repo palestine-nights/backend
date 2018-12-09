@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/palestine-nights/backend/src/tools"
 	"net/http"
 	"strconv"
 	"time"
@@ -74,7 +75,42 @@ func (server *Server) postReservation(c *gin.Context) {
 		return
 	}
 
+	// Create reservation
 	err = reservation.Insert(server.DB)
+
+	if err != nil {
+		c.JSON(http.StatusConflict, GenericError{Error: err.Error()})
+		return
+	}
+
+	// Create tokens
+	confirmationToken := db.Token.Generate(db.Token{}, reservation.ID, "confirm")
+	cancellationToken := db.Token.Generate(db.Token{}, reservation.ID, "cancel")
+	err = confirmationToken.Insert(server.DB)
+	if err != nil {
+		db.Reservation{}.Destroy(server.DB, reservation.ID)
+		c.JSON(http.StatusBadRequest, GenericError{Error: err.Error()})
+		return
+	}
+	err = cancellationToken.Insert(server.DB)
+	if err != nil {
+		db.Reservation{}.Destroy(server.DB, reservation.ID)
+		c.JSON(http.StatusBadRequest, GenericError{Error: err.Error()})
+		return
+	}
+
+	emailReservation := tools.Reservation{
+		Guests:           reservation.Guests,
+		Email:            reservation.Email,
+		FullName:         reservation.FullName,
+		Time:             reservation.Time,
+		Duration:         reservation.Duration,
+		ConfirmationCode: confirmationToken.Code,
+		CancellationCode: cancellationToken.Code,
+	}
+
+	// Send email
+	go tools.SendReservationEmail(reservation.Email, emailReservation)
 
 	if err == nil {
 		c.JSON(http.StatusOK, reservation)
@@ -153,11 +189,110 @@ func (server *Server) approveReservation(c *gin.Context) {
 	server.updateReservationState(c, db.StateApproved)
 }
 
+/// swagger:route POST /reservations/confirm/{code}/ reservations confirmReservation
+/// Confirm reservation.
+/// Responses:
+///   200: State
+///   400: GenericError
+func (server *Server) confirmReservation(c *gin.Context) {
+	code := c.Param("code")
+	if len(code) == 0 {
+		c.JSON(http.StatusBadRequest, GenericError{Error: "Missing reservation code"})
+		return
+	}
+
+	token, err := db.Token{}.FindByCode(server.DB, code)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, GenericError{Error: err.Error()})
+		return
+	}
+
+	if token.Type != "confirm" {
+		c.JSON(http.StatusBadRequest, GenericError{Error: "Cannot use this code to confirm reservation"})
+		return
+	}
+
+	if token.State == "used" {
+		c.JSON(http.StatusBadRequest, GenericError{Error: "This code is already used"})
+		return
+	}
+
+	reservation, err := db.Reservation{}.Find(server.DB, token.ReservationID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, GenericError{Error: err.Error()})
+		return
+	}
+
+	if reservation.State != "created" {
+		message := "Cannot confirm reservation because it has state: " + string(reservation.State)
+		c.JSON(http.StatusBadRequest, GenericError{Error: message})
+		return
+	}
+
+	reservation.State = "confirmed"
+	err = reservation.Update(server.DB)
+
+	token.State = "used"
+	token.UpdateState(server.DB)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+	} else {
+		c.JSON(http.StatusNoContent, nil)
+	}
+}
+
 /// swagger:route POST /reservations/approve/{id} reservations cancelReservation
 /// Cancel reservation.
 /// Responses:
 ///   200: State
 ///   400: GenericError
 func (server *Server) cancelReservation(c *gin.Context) {
-	server.updateReservationState(c, db.StateCancelled)
+	// Cancel by id
+	_, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err == nil {
+		server.updateReservationState(c, db.StateCancelled)
+		return
+	}
+
+	// Cancel by code
+	code := c.Param("id")
+	if len(code) == 0 {
+		c.JSON(http.StatusBadRequest, GenericError{Error: "Missing reservation code"})
+		return
+	}
+
+	token, err := db.Token{}.FindByCode(server.DB, code)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, GenericError{Error: err.Error()})
+		return
+	}
+
+	if token.Type != "cancel" {
+		c.JSON(http.StatusBadRequest, GenericError{Error: "Cannot use this code to cancel reservation"})
+		return
+	}
+
+	if token.State == "used" {
+		c.JSON(http.StatusBadRequest, GenericError{Error: "This code is already used"})
+		return
+	}
+
+	reservation, err := db.Reservation{}.Find(server.DB, token.ReservationID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, GenericError{Error: err.Error()})
+		return
+	}
+
+	reservation.State = "cancelled"
+	err = reservation.Update(server.DB)
+
+	token.State = "used"
+	token.UpdateState(server.DB)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
+	} else {
+		c.JSON(http.StatusNoContent, nil)
+	}
 }

@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `reservations` (
   guests       TINYINT UNSIGNED NOT NULL,
   email        VARCHAR(63) NOT NULL,
   phone        VARCHAR(63) NOT NULL,
-  state        ENUM('created', 'approved', 'cancelled') NOT NULL DEFAULT 'created',
+  state        ENUM('created', 'confirmed', 'approved', 'cancelled') NOT NULL DEFAULT 'created',
   full_name    VARCHAR(255) NOT NULL,
   time         DATETIME NOT NULL,
   duration     BIGINT,
@@ -53,4 +53,26 @@ CREATE TABLE IF NOT EXISTS `menu` (
   PRIMARY KEY (id),
   FOREIGN KEY (category_id)
     REFERENCES categories(id)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `categories` (
+  id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name        VARCHAR(255) NOT NULL,
+  order       INT UNSIGNED NOT NULL,
+  created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `tokens` (
+  id              INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  reservation_id  INT UNSIGNED NOT NULL,
+  code            VARCHAR(255) NOT NULL,
+  type            VARCHAR(63) NOT NULL,
+  state           VARCHAR(63) NOT NULL DEFAULT 'unused',
+  created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  FOREIGN KEY (reservation_id)
+    REFERENCES resevations(id)
 ) ENGINE = InnoDB;

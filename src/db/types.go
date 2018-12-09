@@ -99,3 +99,16 @@ type MenuCategory struct {
 	CreatedAt time.Time `json:"-" db:"created_at"`
 	UpdatedAt time.Time `json:"-" db:"updated_at"`
 }
+
+// Token object for REST API.
+//
+// swagger:model
+type Token struct {
+	ID            uint64    `json:"id" db:"id"`
+	ReservationID uint64    `json:"reservation_id" db:"reservation_id"`
+	Code          string    `json:"code" db:"code"`
+	Type          string    `json:"type" db:"type"`
+	State         string    `json:"state" db:"state"`
+	CreatedAt     time.Time `json:"-" db:"created_at"`
+	UpdatedAt     time.Time `json:"-" db:"updated_at"`
+}

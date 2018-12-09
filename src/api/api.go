@@ -68,6 +68,7 @@ func (server *Server) initializeRouter() {
 		reservationsRouter.GET("/:id", server.getReservation)
 		reservationsRouter.POST("/approve/:id", server.approveReservation)
 		reservationsRouter.POST("/cancel/:id", server.cancelReservation)
+		reservationsRouter.POST("/confirm/:code", server.confirmReservation)
 	}
 
 	menuRouter := server.Router.Group("/menu")

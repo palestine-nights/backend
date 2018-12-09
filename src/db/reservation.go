@@ -116,6 +116,10 @@ func (Reservation) Destroy(db *sqlx.DB, id uint64) error {
 		return err
 	}
 
+	if _, err := db.Exec(`DELETE FROM reservations WHERE id = ?;`, id); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -156,7 +160,7 @@ func (reservation *Reservation) Insert(db *sqlx.DB) error {
 // Update puts new values for reservation row fields.
 func (reservation *Reservation) Update(db *sqlx.DB) error {
 	sql := `UPDATE reservations SET
-	(table_id = ?, guests = ?, email = ?, phone = ?, full_name = ?, time = ?, duration = ?)
+	table_id = ?, guests = ?, email = ?, phone = ?, state= ?, full_name = ?, time = ?, duration = ? 
 	WHERE id = ?`
 
 	_, err := db.Exec(sql,
@@ -164,6 +168,7 @@ func (reservation *Reservation) Update(db *sqlx.DB) error {
 		reservation.Guests,
 		reservation.Email,
 		reservation.Phone,
+		reservation.State,
 		reservation.FullName,
 		reservation.Time,
 		reservation.Duration,
