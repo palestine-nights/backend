@@ -1,13 +1,12 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 	"github.com/palestine-nights/backend/src/db"
 )
 
@@ -17,12 +16,12 @@ import (
 /// Creates reservation.
 /// Responses:
 ///   200: Reservation
-func (server *Server) postReservation(w http.ResponseWriter, r *http.Request) {
+///   400: GenericError
+func (server *Server) postReservation(c *gin.Context) {
 	reservation := db.Reservation{}
-	decoder := json.NewDecoder(r.Body)
 
-	if err := decoder.Decode(&reservation); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+	if err := c.ShouldBindJSON(&reservation); err != nil {
+		c.JSON(http.StatusBadRequest, GenericError{Error: "Invalid request payload"})
 		return
 	}
 
@@ -31,54 +30,56 @@ func (server *Server) postReservation(w http.ResponseWriter, r *http.Request) {
 
 	// Validate, that number of guests is more that 0.
 	if reservation.Guests <= 0 {
-		respondWithError(w, http.StatusBadRequest, "Invalid number of guests, should be greater that 0")
+		c.JSON(http.StatusBadRequest, GenericError{Error: "Invalid number of guests, should be greater that 0"})
 		return
 	}
 
 	// Validate, that duration between 1h to 6h.
 	if reservation.Duration < time.Hour {
-		respondWithError(w, http.StatusBadRequest, "Invalid duration time, should be more than "+time.Hour.String())
+		errorMsg := fmt.Sprintf("Invalid duration time, should be more than %s", time.Hour.String())
+		c.JSON(http.StatusBadRequest, GenericError{Error: errorMsg})
 		return
 	}
 	if reservation.Duration > 6*time.Hour {
-		respondWithError(w, http.StatusBadRequest, "Invalid duration time, should be less than "+(time.Hour*6).String())
+		errorMsg := fmt.Sprintf("Invalid duration time, should be less than %s", time.Hour.String())
+		c.JSON(http.StatusBadRequest, GenericError{Error: errorMsg})
 		return
 	}
 
 	err := reservation.Validate(server.DB)
 
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, err.Error())
+		c.JSON(http.StatusBadRequest, GenericError{Error: err.Error()})
 		return
 	}
 
 	// Validate, that reservation time is not earlier than current time.
 	if reservation.Time.Before(time.Now()) {
-		errorMessage := fmt.Sprintf("Invalid reservation time")
-		respondWithError(w, http.StatusBadRequest, errorMessage)
+		errorMsg := fmt.Sprintf("Invalid reservation time")
+		c.JSON(http.StatusBadRequest, GenericError{Error: errorMsg})
 		return
 	}
 
 	// Validate, that table with TableID exists.
 	table, err := db.Table.Find(db.Table{}, server.DB, reservation.TableID)
 	if err != nil {
-		errorMessage := fmt.Sprintf("Invalid table id %d", reservation.TableID)
-		respondWithError(w, http.StatusBadRequest, errorMessage)
+		errorMsg := fmt.Sprintf("Invalid table id %d", reservation.TableID)
+		c.JSON(http.StatusBadRequest, GenericError{Error: errorMsg})
 		return
 	}
 	// Validate, that number of guests not bigger that table has.
 	if reservation.Guests > table.Places {
-		errorMessage := fmt.Sprintf("Invalid amount of guests, maximum amount for this table is %d", table.Places)
-		respondWithError(w, http.StatusBadRequest, errorMessage)
+		errorMsg := fmt.Sprintf("Invalid amount of guests, maximum amount for this table is %d", table.Places)
+		c.JSON(http.StatusBadRequest, GenericError{Error: errorMsg})
 		return
 	}
 
 	err = reservation.Insert(server.DB)
 
-	if err != nil {
-		respondWithError(w, http.StatusConflict, err.Error())
+	if err == nil {
+		c.JSON(http.StatusOK, reservation)
 	} else {
-		respondWithJSON(w, http.StatusOK, reservation)
+		c.JSON(http.StatusConflict, GenericError{Error: err.Error()})
 	}
 }
 
@@ -86,22 +87,22 @@ func (server *Server) postReservation(w http.ResponseWriter, r *http.Request) {
 /// Returns reservation.
 /// Responses:
 ///   200: Reservation
-func (server *Server) getReservation(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	id, err := strconv.ParseUint(vars["id"], 10, 64)
+///   404: GenericError
+func (server *Server) getReservation(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid reservation ID, must be integer")
+		c.JSON(http.StatusBadRequest, GenericError{Error: "Invalid reservation ID, must be integer"})
 		return
 	}
 
 	reservation, err := db.Reservation.Find(db.Reservation{}, server.DB, id)
 
-	if err != nil {
-		respondWithError(w, http.StatusNotFound, fmt.Sprintf("Reservation with id %d could not be found", id))
+	if err == nil {
+		c.JSON(http.StatusOK, reservation)
 	} else {
-		respondWithJSON(w, http.StatusOK, reservation)
+		errorMsg := fmt.Sprintf("Reservation with id %d could not be found", id)
+		c.JSON(http.StatusNotFound, GenericError{Error: errorMsg})
 	}
 }
 
@@ -109,27 +110,20 @@ func (server *Server) getReservation(w http.ResponseWriter, r *http.Request) {
 /// Returns reservation.
 /// Responses:
 ///   200: []Reservation
-func (server *Server) getReservations(w http.ResponseWriter, r *http.Request) {
-	getReservations := db.Reservation.GetAll
-
-	if r.FormValue("upcoming") == "true" {
-		getReservations = db.Reservation.GetUpcoming
-	}
-
-	if reservations, err := getReservations(db.Reservation{}, server.DB); err != nil {
-		respondWithError(w, http.StatusInternalServerError, err.Error())
+///   500: []Reservation
+func (server *Server) getReservations(c *gin.Context) {
+	if reservations, err := db.Reservation.GetAll(db.Reservation{}, server.DB); err == nil {
+		c.JSON(http.StatusOK, reservations)
 	} else {
-		respondWithJSON(w, http.StatusOK, reservations)
+		c.JSON(http.StatusInternalServerError, GenericError{Error: err.Error()})
 	}
 }
 
-func (server *Server) updateReservationState(w http.ResponseWriter, r *http.Request, state db.State) {
-	vars := mux.Vars(r)
-
-	id, err := strconv.ParseUint(vars["id"], 10, 64)
+func (server *Server) updateReservationState(c *gin.Context, state db.State) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid reservation ID, must be integer")
+		c.JSON(http.StatusBadRequest, GenericError{Error: "Invalid reservation ID, must be integer"})
 		return
 	}
 
@@ -139,29 +133,31 @@ func (server *Server) updateReservationState(w http.ResponseWriter, r *http.Requ
 	err = reservation.Update(server.DB)
 
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid reservation ID, must be integer")
+		c.JSON(http.StatusBadRequest, GenericError{Error: "Invalid reservation ID, must be integer"})
 		return
 	}
 
-	if err != nil {
-		respondWithError(w, http.StatusConflict, err.Error())
+	if err == nil {
+		c.JSON(http.StatusOK, reservation.State)
 	} else {
-		respondWithJSON(w, http.StatusOK, reservation.State)
+		c.JSON(http.StatusBadRequest, GenericError{Error: err.Error()})
 	}
 }
 
-/// swagger:route POST /reservations/{id} reservations approveReservation
+/// swagger:route POST /reservations/cancel{id}/ reservations approveReservation
 /// Approve reservation.
 /// Responses:
 ///   200: State
-func (server *Server) approveReservation(w http.ResponseWriter, r *http.Request) {
-	server.updateReservationState(w, r, db.StateApproved)
+///   400: GenericError
+func (server *Server) approveReservation(c *gin.Context) {
+	server.updateReservationState(c, db.StateApproved)
 }
 
-/// swagger:route POST /reservations/{id} reservations cancelReservation
+/// swagger:route POST /reservations/approve/{id} reservations cancelReservation
 /// Cancel reservation.
 /// Responses:
 ///   200: State
-func (server *Server) cancelReservation(w http.ResponseWriter, r *http.Request) {
-	server.updateReservationState(w, r, db.StateCancelled)
+///   400: GenericError
+func (server *Server) cancelReservation(c *gin.Context) {
+	server.updateReservationState(c, db.StateCancelled)
 }
