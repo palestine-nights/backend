@@ -14,10 +14,10 @@ func (MenuItem) GetAll(db *sqlx.DB) (*[]MenuItem, error) {
 }
 
 // GetByCategory returns list of all menu items in given category.
-func (MenuItem) GetByCategory(db *sqlx.DB, category string) (*[]MenuItem, error) {
+func (MenuItem) GetByCategory(db *sqlx.DB, categoryID uint64) (*[]MenuItem, error) {
 	menuItems := make([]MenuItem, 0)
 
-	if err := db.Select(&menuItems, `SELECT * FROM menu WHERE category = ?`, category); err != nil {
+	if err := db.Select(&menuItems, `SELECT * FROM menu WHERE category_id = ?`, categoryID); err != nil {
 		return nil, err
 	}
 
@@ -56,7 +56,7 @@ func (menuItem *MenuItem) Update(db *sqlx.DB) error {
 		return err
 	}
 
-	query := `UPDATE menu SET name=:name, description=:description, price=:price, category=:category, image_url=:image_url WHERE id=:id`
+	query := `UPDATE menu SET name=:name, description=:description, price=:price, category_id=:category_id, image_url=:image_url WHERE id=:id`
 	_, err := db.NamedExec(query, menuItem)
 
 	if err != nil {
@@ -68,9 +68,9 @@ func (menuItem *MenuItem) Update(db *sqlx.DB) error {
 
 // Insert adds new menu item.
 func (menuItem *MenuItem) Insert(db *sqlx.DB) error {
-	sqlStatement := `INSERT INTO menu (name, description, price, category, image_url) VALUES (?, ?, ?, ?, ?);`
+	sqlStatement := `INSERT INTO menu (name, description, price, category_id, image_url) VALUES (?, ?, ?, ?, ?);`
 
-	result, err := db.Exec(sqlStatement, menuItem.Name, menuItem.Description, menuItem.Price, menuItem.Category, menuItem.ImageURL)
+	result, err := db.Exec(sqlStatement, menuItem.Name, menuItem.Description, menuItem.Price, menuItem.CategoryID, menuItem.ImageURL)
 
 	if err != nil {
 		return err

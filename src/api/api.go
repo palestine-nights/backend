@@ -92,7 +92,8 @@ func (server *Server) initializeRouter() {
 
 	categoriesRouter := server.Router.Group("/categories")
 	{
-		categoriesRouter.POST("categories", server.getAllCategories)
-		categoriesRouter.GET("/categories/:category", server.listMenuByCategory)
+		categoriesRouter.POST("", server.getAllCategories)
+		categoriesRouter.PUT("/:id", server.updateCategory)
+		categoriesRouter.GET("/:category_id", server.listMenuItemsByCategory)
 	}
 }

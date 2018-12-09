@@ -77,10 +77,25 @@ type MenuItem struct {
 	Price float32 `json:"price" db:"price"`
 	// Category of the menu item.
 	// required: true
-	Category string `json:"category" db:"category"`
+	CategoryID uint64 `json:"category_id" db:"category_id"`
 	// Image URL for the menu item.
 	// required: true
 	ImageURL  string    `json:"image_url" db:"image_url"`
+	CreatedAt time.Time `json:"-" db:"created_at"`
+	UpdatedAt time.Time `json:"-" db:"updated_at"`
+}
+
+// MenuCategory model for menu categories.
+//
+// swagger:model
+type MenuCategory struct {
+	ID uint64 `json:"id" db:"id"`
+	// Name of the menu category.
+	// required: true
+	Name string `json:"name" db:"name"`
+	// Order of this category in categories list.
+	// required: true
+	Order     uint64    `json:"order" db:"order"`
 	CreatedAt time.Time `json:"-" db:"created_at"`
 	UpdatedAt time.Time `json:"-" db:"updated_at"`
 }

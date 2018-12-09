@@ -24,23 +24,6 @@ func (server *Server) listMenu(c *gin.Context) {
 	}
 }
 
-/// swagger:route GET /categories/{category} menu listMenuByCategory
-/// List menu items with specified category.
-/// Responses:
-///   200: []MenuItem
-///   500: GenericError
-func (server *Server) listMenuByCategory(c *gin.Context) {
-	category := c.Param("catgory")
-
-	menu, err := db.MenuItem.GetByCategory(db.MenuItem{}, server.DB, category)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, GenericError{Error: err.Error()})
-	} else {
-		c.JSON(http.StatusOK, menu)
-	}
-}
-
 /// swagger:route GET /menu/{id} menu getMenuItem
 /// Returns menu item.
 /// Responses:
@@ -82,10 +65,7 @@ func (server *Server) postMenuItem(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, GenericError{Error: "Name should not be empty"})
 		return
 	}
-	if len(menuItem.Category) == 0 {
-		c.JSON(http.StatusBadRequest, GenericError{Error: "Category should not be empty"})
-		return
-	}
+
 	if menuItem.Price <= 0 {
 		c.JSON(http.StatusBadRequest, GenericError{Error: "Price should be more than 0"})
 		return
@@ -125,10 +105,7 @@ func (server *Server) putMenuItem(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, GenericError{Error: "Name should not be empty"})
 		return
 	}
-	if len(menuItem.Category) == 0 {
-		c.JSON(http.StatusBadRequest, GenericError{Error: "Category should not be empty"})
-		return
-	}
+
 	if menuItem.Price <= 0 {
 		c.JSON(http.StatusBadRequest, GenericError{Error: "Price should be more than 0"})
 		return
