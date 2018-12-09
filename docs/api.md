@@ -179,7 +179,7 @@
 ### Models
 ---
 
-### Duration  
+### Duration
 
 A Duration represents the elapsed time between two instants
 as an int64 nanosecond count. The representation limits the
@@ -191,13 +191,13 @@ largest representable duration to approximately 290 years.
 as an int64 nanosecond count. The representation limits the
 largest representable duration to approximately 290 years. |  |
 
-### GenericError  
+### GenericError
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | error | string | Error massage. | No |
 
-### MenuItem 
+### MenuItem
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
@@ -208,7 +208,7 @@ largest representable duration to approximately 290 years. |  |
 | name | string | Name of the menu item. | Yes |
 | price | float | Price of the menu item in Bahrain Dinars. | Yes |
 
-### Reservation  
+### Reservation
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
@@ -222,13 +222,13 @@ largest representable duration to approximately 290 years. |  |
 | table_id | integer (uint64) | ID of table, associated with reservation. | Yes |
 | time | dateTime | Time of the reservation. | Yes |
 
-### State  
+### State
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
 | State | string |  |  |
 
-### Table  
+### Table
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
