@@ -144,17 +144,3 @@ func (server *Server) deleteMenuItem(c *gin.Context) {
 		c.JSON(http.StatusNotFound, GenericError{Error: err.Error()})
 	}
 }
-
-/// swagger:route GET /categories menu getAllCategories
-/// List menu categories.
-/// 400:
-/// 404: GenericError
-func (server *Server) getAllCategories(c *gin.Context) {
-	categories, err := db.MenuItem.GetCategories(db.MenuItem{}, server.DB)
-
-	if err == nil {
-		c.JSON(http.StatusOK, categories)
-	} else {
-		c.JSON(http.StatusNotFound, GenericError{Error: err.Error()})
-	}
-}
