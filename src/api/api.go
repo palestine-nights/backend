@@ -54,7 +54,7 @@ func (server *Server) initializeRouter() {
 
 	tablesRouter := server.Router.Group("/tables")
 	{
-		tablesRouter.POST("", server.postTable)
+		tablesRouter.POST("", authorized(server.postTable))
 		tablesRouter.GET("", server.listTables)
 		tablesRouter.GET("/:id", server.getTable)
 		tablesRouter.PUT("/:id", server.putTable)
@@ -85,5 +85,10 @@ func (server *Server) initializeRouter() {
 		categoriesRouter.GET("", server.getAllCategories)
 		categoriesRouter.PUT("/:id", server.updateCategory)
 		categoriesRouter.GET("/:category_id", server.listMenuItemsByCategory)
+	}
+
+	authRouter := server.Router.Group("/auth")
+	{
+		authRouter.POST("", server.authenticateUser)
 	}
 }
