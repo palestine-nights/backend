@@ -1,3 +1,23 @@
+### /categories
+---
+##### ***GET***
+**Summary:** List menu categories.
+
+**Description:** 400:
+404: GenericError
+
+### /categories/{category}
+---
+##### ***GET***
+**Summary:** List menu items with specified category.
+
+**Responses**
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | MenuItem | [ [MenuItem](#menuitem) ] |
+| 500 | GenericError | [GenericError](#genericerror) |
+
 ### /menu
 ---
 ##### ***GET***
@@ -8,6 +28,7 @@
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | MenuItem | [ [MenuItem](#menuitem) ] |
+| 500 | GenericError | [GenericError](#genericerror) |
 
 ##### ***POST***
 **Summary:** Create menu item.
@@ -16,23 +37,8 @@
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 200 | MenuItem | [MenuItem](#menuitem) |
-
-### /menu/categories
----
-##### ***GET***
-**Summary:** List menu categories.
-
-### /menu/{category}
----
-##### ***GET***
-**Summary:** List menu items with specified category.
-
-**Responses**
-
-| Code | Description | Schema |
-| ---- | ----------- | ------ |
-| 200 | MenuItem | [ [MenuItem](#menuitem) ] |
+| 201 | MenuItem | [MenuItem](#menuitem) |
+| 400 | GenericError | [GenericError](#genericerror) |
 
 ### /menu/{id}
 ---
@@ -44,6 +50,7 @@
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | MenuItem | [MenuItem](#menuitem) |
+| 404 | GenericError | [GenericError](#genericerror) |
 
 ##### ***PUT***
 **Summary:** Update menu item.
@@ -53,15 +60,17 @@
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | MenuItem | [MenuItem](#menuitem) |
+| 400 | GenericError | [GenericError](#genericerror) |
 
 ##### ***DELETE***
 **Summary:** Delete menu item.
 
 **Responses**
 
-| Code | Description |
-| ---- | ----------- |
-| 204 |  |
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 204 |  |  |
+| 404 | GenericError | [GenericError](#genericerror) |
 
 ### /reservations
 ---
@@ -73,6 +82,31 @@
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Reservation | [Reservation](#reservation) |
+| 400 | GenericError | [GenericError](#genericerror) |
+
+### /reservations/approve/{id}
+---
+##### ***POST***
+**Summary:** Cancel reservation.
+
+**Responses**
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | State | [State](#state) |
+| 400 | GenericError | [GenericError](#genericerror) |
+
+### /reservations/cancel{id}/
+---
+##### ***POST***
+**Summary:** Approve reservation.
+
+**Responses**
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | State | [State](#state) |
+| 400 | GenericError | [GenericError](#genericerror) |
 
 ### /reservations/{id}
 ---
@@ -84,15 +118,7 @@
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Reservation | [ [Reservation](#reservation) ] |
-
-##### ***POST***
-**Summary:** Cancel reservation.
-
-**Responses**
-
-| Code | Description | Schema |
-| ---- | ----------- | ------ |
-| 200 | State | [State](#state) |
+| 500 | Reservation | [ [Reservation](#reservation) ] |
 
 ### /tables
 ---
@@ -104,6 +130,7 @@
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Table | [ [Table](#table) ] |
+| 500 | GenericError | [GenericError](#genericerror) |
 
 ##### ***POST***
 **Summary:** Creates table.
@@ -113,6 +140,7 @@
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Table | [Table](#table) |
+| 400 | GenericError | [GenericError](#genericerror) |
 
 ### /tables/{id}
 ---
@@ -124,6 +152,8 @@
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Table | [Table](#table) |
+| 400 | GenericError | [GenericError](#genericerror) |
+| 404 | GenericError | [GenericError](#genericerror) |
 
 ##### ***PUT***
 **Summary:** Updates table.
@@ -133,15 +163,18 @@
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | Table | [Table](#table) |
+| 400 | GenericError | [GenericError](#genericerror) |
+| 404 | GenericError | [GenericError](#genericerror) |
 
 ##### ***DELETE***
 **Summary:** Deletes table.
 
 **Responses**
 
-| Code | Description |
-| ---- | ----------- |
-| 204 |  |
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 204 |  |  |
+| 400 | GenericError | [GenericError](#genericerror) |
 
 ### Models
 ---
@@ -164,7 +197,7 @@ largest representable duration to approximately 290 years. |  |
 | ---- | ---- | ----------- | -------- |
 | error | string | Error massage. | No |
 
-### MenuItem  
+### MenuItem 
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |

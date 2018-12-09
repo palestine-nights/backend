@@ -63,8 +63,6 @@ func (server *Server) initializeRouter() {
 
 	server.Router.StaticFile("/", "./html/home.html")
 
-	/* --- Gin Tables --- */
-
 	tablesRouter := server.Router.Group("/tables")
 	{
 		tablesRouter.POST("", server.postTable)
