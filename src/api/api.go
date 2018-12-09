@@ -3,8 +3,6 @@ package api
 import (
 	"database/sql"
 	"fmt"
-	"net/http"
-	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -37,6 +35,7 @@ func GetServer(user, password, database, host, port string) *Server {
 	DB := db.Initialize(connectionString)
 
 	router := gin.Default()
+	router.Use(cors.Default())
 	server := Server{Router: router, DB: DB}
 
 	server.initializeRouter()
@@ -45,18 +44,8 @@ func GetServer(user, password, database, host, port string) *Server {
 }
 
 // ListenAndServe server.
-func (server *Server) ListenAndServe(port string) {
-	server.Router.Use(cors.Default())
-
-	httpServer := http.Server{
-		Addr:         ":" + port,
-		Handler:      server.Router,
-		WriteTimeout: time.Second * 15,
-		ReadTimeout:  time.Second * 15,
-		IdleTimeout:  time.Second * 60,
-	}
-
-	httpServer.ListenAndServe()
+func (server *Server) ListenAndServe() {
+	server.Router.Run()
 }
 
 func (server *Server) initializeRouter() {

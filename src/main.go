@@ -12,8 +12,6 @@ func main() {
 	databaseHost := tools.GetEnv("DATABASE_HOST", "localhost")
 	databasePort := tools.GetEnv("DATABASE_PORT", "3306")
 
-	port := tools.GetEnv("PORT", "8080")
-
 	server := api.GetServer(
 		databaseUser,
 		databasePassword,
@@ -22,5 +20,5 @@ func main() {
 		databasePort,
 	)
 
-	server.ListenAndServe(port)
+	server.ListenAndServe()
 }
