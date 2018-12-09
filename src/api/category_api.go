@@ -8,7 +8,7 @@ import (
 	"github.com/palestine-nights/backend/src/db"
 )
 
-/// swagger:route PUT /categories/{id} menu postCategory
+/// swagger:route POST /categories/{id} menu postCategory
 /// Create menu category.
 /// Responses:
 ///   200: MenuCategory
@@ -62,7 +62,7 @@ func (server *Server) updateCategory(c *gin.Context) {
 	}
 }
 
-/// swagger:route GET /menu/categories/{category_id} menu listMenuByCategory
+/// swagger:route GET /categories/{category_id} menu listMenuByCategory
 /// List menu items with specified category.
 /// Responses:
 ///   200: []MenuItem
