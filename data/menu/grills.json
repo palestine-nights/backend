@@ -5,28 +5,28 @@
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "description": "",
             "price": 3.000,
-            "category": "grills"
+            "category": 8
         },
         {
             "name": "Sheesh Tawook",
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "description": "",
             "price": 3.000,
-            "category": "grills"
+            "category": 8
         },
         {
             "name": "Half Grilled Chicken",
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "description": "",
             "price": 2.100,
-            "category": "grills"
+            "category": 8
         },
         {
             "name": "Full Grilled Chicken",
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "description": "",
             "price": 3.900,
-            "category": "grills"
+            "category": 8
         }
     ]
 }

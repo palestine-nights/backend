@@ -4,168 +4,168 @@
             "name": "White rice Mansaf with Meat",
             "price": 4.000,
             "description" : "Carefully prepared with oldest family recipes Lamb or Chicken is cooked in savory dried yogurt mixture Jameed, served with rice, topped with parsley, toasted almonds and  Accompanied by Jameed soup.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "White rice Mansaf with Chicken",
             "price": 3.000,
             "description" : "Carefully prepared with oldest family recipes Lamb or Chicken is cooked in savory dried yogurt mixture Jameed, served with rice, topped with parsley, toasted almonds and  Accompanied by Jameed soup.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Yellow rice Mansaf with Meat",
             "price": 4.500,
             "description" : "Carefully prepared with oldest family recipes Lamb or Chicken is cooked in savory dried yogurt mixture Jameed, served with rice, topped with parsley, toasted almonds and  Accompanied by Jameed soup.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Yellow rice Mansaf with Chicken",
             "price": 3.500,
             "description" : "Carefully prepared with oldest family recipes Lamb or Chicken is cooked in savory dried yogurt mixture Jameed, served with rice, topped with parsley, toasted almonds and  Accompanied by Jameed soup.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Maqloobah with Meat",
             "price": 4.500,
             "description": "This dish includes layers of Meat/Chicken, rice with special ingredients and fried eggplants which are cooked all together and flipped upside down, then topped with parsley and toasted almonds for serving. * Best match: ‘Cucumber in Yogurt’ salad.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Maqloobah with Chicken",
             "price": 3.500,
             "description": "This dish includes layers of Meat/Chicken, rice with special ingredients and fried eggplants which are cooked all together and flipped upside down, then topped with parsley and toasted almonds for serving. * Best match: ‘Cucumber in Yogurt’ salad.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Qidra with Meat",
             "price": 4.000,
             "description": "Spicy and rich in flavors Qidra of Khalil is one of the most impressive palestinian dishes. Rice, Chickpeas, onion and garlic mixed with special spices, cooked with Meat or Chicken in a pot covered with dough create an unforgettable experience for your tastebuds.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Qidra with Chicken",
             "price": 3.000,
             "description": "Spicy and rich in flavors Qidra of Khalil is one of the most impressive palestinian dishes. Rice, Chickpeas, onion and garlic mixed with special spices, cooked with Meat or Chicken in a pot covered with dough create an unforgettable experience for your tastebuds.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Quzi Al Sham with Meat",
             "price": 4.000,
             "description": "This dish will please the most picky customers. Rice cooked with vegetables, Chicken or Meat and special Quzi spices is served inside of crispy golden-brown dough ball and a cup of soup.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Quzi Al Sham with Chicken",
             "price": 3.000,
             "description": "This dish will please the most picky customers. Rice cooked with vegetables, Chicken or Meat and special Quzi spices is served inside of crispy golden-brown dough ball and a cup of soup.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Kubba In Yougurt",
             "price": 3.500,
             "description": "Kubba made of Meat and bulgur, stuffed with fried Meat, pine and onion and shaped in balls is cooked in spiced yogurt and served with vermicelli rice.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Zucchini In Yougurt",
             "price": 3.500,
             "description": "Stuffed with Meat and pine and fried till golden brown, zucchini is cooked in yogurt and served with vermicelli rice.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Sheesh Barak",
             "price": 3.500,
             "description": "Balls of dough stuffed with fried Meat, cooked in yogurt, sprinkled with garlic and herbs and served with vermicelli rice.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Maftool with Meat",
             "price": 4.000,
             "description": "Maftool is a royal dish for palestinian families, as it is served for special occasions and weddings. If you want to show your guest biggest respect, - invite him for w plate of Maftool.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Maftool with Chicken",
             "price": 3.500,
             "description": "Maftool is a royal dish for palestinian families, as it is served for special occasions and weddings. If you want to show your guest biggest respect, - invite him for w plate of Maftool.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Freekeh with Meat",
             "price": 4.000,
             "description": "Freekeh - another widely known and loved dish: pre-roasted green wheat, onions, spices and a little of magic, with a quarter of Chicken on the top are cooked together to create a plate of elegance and tradition in one.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Freekeh with Chicken",
             "price": 3.500,
             "description": "Freekeh - another widely known and loved dish: pre-roasted green wheat, onions, spices and a little of magic, with a quarter of Chicken on the top are cooked together to create a plate of elegance and tradition in one.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Bamiya with Meat",
             "price": 4.000,
             "description": "Okra cooked with chunks of Meat in tomato sauce. Served with vermicelli rice.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Bamiya with Chicken",
             "price": 3.500,
             "description": "Okra cooked with chunks of Meat in tomato sauce. Served with vermicelli rice.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Fasoliya Beda",
             "price": 4.000,
             "description": "Broad beans cooked with chunks of Meat in tomato sauce. Served with vermicelli rice.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Fasoliya Khadra",
             "price": 4.000,
             "description": "Green beans cooked with chunks of Meat in tomato sauce. Served with vermicelli rice.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Molokhiya Half Chicken",
             "price": 3.500,
             "description": "Known as Arab’s mallow this vegetable is finely chopped and cooked as a thick soup, served with Chicken and vermicelli rice.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Molokhiya Quarter Chicken",
             "price": 3.000,
             "description": "Known as Arab’s mallow this vegetable is finely chopped and cooked as a thick soup, served with Chicken and vermicelli rice.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Fawaregh",
             "price": 6.000,
             "description": "As difficult in making as delicious in eating. Cleaned to perfection and stuffed with Meat, chickpeas and rice  intestines are cooked and served on a bed of ‘fatta’ bread with garlic and herbs, accompanied by soup.",
-            "category": "main-dishes",
+            "category_id": 5,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         }
     ]

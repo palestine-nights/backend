@@ -3,55 +3,55 @@
         {
             "name": "Small tray of Kufta Bil Bandoora",
             "description": "A juicy and rich in flavors layer of minced Meat mixture covered with slices of potato and tomato cooked with tomato sauce in a pot. Served with bread. Preparation time: 30 minutes.",
-            "category": "from-the-oven",
+            "category": 7,
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "price": 3.500
         },
         {
             "name": "Big tray of Kufta Bil Bandoora",
             "description": "A juicy and rich in flavors layer of minced Meat mixture covered with slices of potato and tomato cooked with tomato sauce in a pot. Served with bread. Preparation time: 30 minutes.",
-            "category": "from-the-oven",
+            "category": 7,
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "price": 6.000
         },
         {
             "name": "Small tray of Kufta Bil Thine",
             "description": "A juicy and rich in flavors layer of minced Meat mixture covered with slices of potato and cooked in thick tahini sauce in a pot. Sprinkled with golden brown pine nuts, to reach the best of its taste. Served with bread. Preparation time: 30 minutes.",
-            "category": "from-the-oven",
+            "category": 7,
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "price": 4.500
         },
         {
             "name": "Big tray of Kufta Bil Thine",
             "description": "A juicy and rich in flavors layer of minced Meat mixture covered with slices of potato and cooked in thick tahini sauce in a pot. Sprinkled with golden brown pine nuts, to reach the best of its taste. Served with bread. Preparation time: 30 minutes.",
-            "category": "from-the-oven",
+            "category": 7,
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "price": 7.000
         },
         {
             "name": "Small tray of Dajaj Mhamar",
             "description": "If you want to try any true palestinian dish, you should order this roasted Chicken and potato tray, cooked with olive oil and sumac. Served with bread. Preparation time: 45 minutes.",
-            "category": "from-the-oven",
+            "category": 7,
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "price": 3.500
         },
         {
             "name": "Big tray of Dajaj Mhamar",
             "description": "If you want to try any true palestinian dish, you should order this roasted Chicken and potato tray, cooked with olive oil and sumac. Served with bread. Preparation time: 45 minutes.",
-            "category": "from-the-oven",
+            "category": 7,
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "price": 5.000
         },
         {
             "name": "Msakhan",
             "description": "Two freshly baked thin crust bread pitas covered with a layer of onion, cooked in olive oil and sumac, topped with half Chicken. Best lunch for cold winter days.",
-            "category": "from-the-oven",
+            "category": 7,
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "price": 3.000
         },
         {
             "name": "Chiken Pot",
-            "category": "from-the-oven",
+            "category": 7,
             "description": "If you are up to eat something exotic and new - order the Chicken pot. Half Chicken cooked with potato and bell pepper in olive oil and spices. Preparation time: 45 minutes.",
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "price": 4.500

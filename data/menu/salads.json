@@ -4,42 +4,42 @@
             "name": "Jarjeer Salad",
             "price": 1.750,
             "description": "Rocca salad with tomato, onion and pomegranate, seasoned with lemon, olive oil and pomegranate syrop.",
-            "category": "salads",
+            "category_id": 4,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Tabbouleh",
             "price": 1.500,
             "description": "Chopped parsley, spring onions, crashed wheat and tomato seasoned with our special tabboula sauce to indulge your taste buds.",
-            "category": "salads",
+            "category_id": 4,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Fattous",
             "price": 1.750,
             "description": "Refreshing mixture of hand-picked vegetables, mouthwatering seasoning, fried bread and pomegranate.",
-            "category": "salads",
+            "category_id": 4,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Green Salad",
             "price": 1.750,
             "description": "Fresh zesty mixture of vegetables ready to please even the most picky customer.",
-            "category": "salads",
+            "category_id": 4,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Mixed Vegetables plate",
             "price": 1.750,
             "description": "Spring onions and rocca to accompany a plate of your choice.",
-            "category": "salads",
+            "category_id": 4,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         },
         {
             "name": "Cucumber in Yogurt",
             "price": 1.750,
             "description": "Traditional Palestinian salad : tiny cubes of cucumber in zesty spiced yogurt sprinkled with dry mint. Best with Maqloobah or Qidra dishes.",
-            "category": "salads",
+            "category_id": 4,
             "image_url": "https://www.palestinenights.com/photo-1.jpg"
         }
     ]
