@@ -5,62 +5,62 @@
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "description": "Red Tea, Tea with Mint, Tea with Miramiya, Tea with Cardamom, Tea with Milk, Green tea.",
             "price": 1.500,
-            "category": "drinks"
+            "category_id": 10
         },
         {
             "name": "Tea Pot",
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "description": "Red Tea, Tea with Mint, Tea with Miramiya, Tea with Cardamom, Tea with Milk, Green tea.",
             "price": 2.500,
-            "category": "drinks"
+            "category_id": 10
         },
         {
             "name": "Turkish Coffee",
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "description": "",
             "price": 1.500,
-            "category": "drinks"
+            "category_id": 10
         },
         {
             "name": "Shaneena",
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "description": "",
             "price": 2.000,
-            "category": "drinks"
+            "category_id": 10
         },
         {
             "name": "Tamer Hindi",
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "description": "",
-            "category": "drinks",
+            "category_id": 10,
             "price": 2.000
         },
         {
             "name": "Fresh Juice",
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "description": "",
-            "category": "drinks",
+            "category_id": 10,
             "price": 2.000
         },
         {
             "name": "Vimto",
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "description": "",
-            "category": "drinks",
+            "category_id": 10,
             "price": 1.500
         },
         {
             "name": "Soft Drinks",
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "description": "",
-            "category": "drinks",
+            "category_id": 10,
             "price": 0.500
         },
         {
             "name": "Water",
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "description": "",
-            "category": "drinks",
+            "category_id": 10,
             "price": 0.500
 
         },
@@ -68,7 +68,7 @@
             "name": "Perrier Water",
             "image_url": "https://www.palestinenights.com/photo-1.jpg",
             "description": "",
-            "category": "drinks",
+            "category_id": 10,
             "price": 1.000
         }
     ]
