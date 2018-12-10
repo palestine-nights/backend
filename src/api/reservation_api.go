@@ -164,23 +164,29 @@ func (server *Server) updateReservationState(c *gin.Context, state db.State) {
 	}
 
 	reservation, err := db.Reservation.Find(db.Reservation{}, server.DB, uint64(id))
-	reservation.State = state
 
+	if err != nil {
+		errorMsg := fmt.Sprintf("Reservation with ID %d does not exist", id)
+		c.JSON(http.StatusBadRequest, GenericError{Error: errorMsg})
+		return
+	}
+
+	reservation.State = state
 	err = reservation.Update(server.DB)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, GenericError{Error: "Invalid reservation ID, must be integer"})
+		c.JSON(http.StatusBadRequest, GenericError{Error: err.Error()})
 		return
 	}
 
 	if err == nil {
-		c.JSON(http.StatusOK, reservation.State)
+		c.JSON(http.StatusOK, reservation)
 	} else {
 		c.JSON(http.StatusBadRequest, GenericError{Error: err.Error()})
 	}
 }
 
-/// swagger:route POST /reservations/cancel{id}/ reservations approveReservation
+/// swagger:route POST /reservations/cancel/{id} reservations approveReservation
 /// Approve reservation.
 /// Responses:
 ///   200: State

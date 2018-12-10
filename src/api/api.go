@@ -35,7 +35,14 @@ func GetServer(user, password, database, host, port string) *Server {
 	DB := db.Initialize(connectionString)
 
 	router := gin.Default()
-	router.Use(cors.Default())
+
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowCredentials = true
+
+	config.AddAllowHeaders("Authorization")
+	router.Use(cors.New(config))
+
 	server := Server{Router: router, DB: DB}
 
 	server.initializeRouter()
@@ -54,37 +61,52 @@ func (server *Server) initializeRouter() {
 
 	tablesRouter := server.Router.Group("/tables")
 	{
-		tablesRouter.POST("", server.postTable)
 		tablesRouter.GET("", server.listTables)
 		tablesRouter.GET("/:id", server.getTable)
-		tablesRouter.PUT("/:id", server.putTable)
-		tablesRouter.DELETE("/:id", server.deleteTable)
+
+		tablesRouter.Use(AuthMiddleware)
+		{
+			tablesRouter.POST("", server.postTable)
+			tablesRouter.PUT("/:id", server.putTable)
+			tablesRouter.DELETE("/:id", server.deleteTable)
+		}
 	}
 
 	reservationsRouter := server.Router.Group("/reservations")
 	{
-		reservationsRouter.POST("", server.postReservation)
 		reservationsRouter.GET("", server.getReservations)
 		reservationsRouter.GET("/:id", server.getReservation)
-		reservationsRouter.POST("/approve/:id", server.approveReservation)
-		reservationsRouter.POST("/cancel/:id", server.cancelReservation)
-		reservationsRouter.POST("/confirm/:code", server.confirmReservation)
+		reservationsRouter.POST("", server.postReservation)
+
+		reservationsRouter.Use(AuthMiddleware)
+		{
+			reservationsRouter.POST("/approve/:id", server.approveReservation)
+			reservationsRouter.POST("/cancel/:id", server.cancelReservation)
+		}
 	}
 
 	menuRouter := server.Router.Group("/menu")
 	{
-		menuRouter.POST("", server.postMenuItem)
 		menuRouter.GET("", server.listMenu)
 		menuRouter.GET("/:id", server.getMenuItem)
-		menuRouter.PUT("/:id", server.putMenuItem)
-		menuRouter.DELETE("/:id", server.deleteMenuItem)
+
+		menuRouter.Use(AuthMiddleware)
+		{
+			menuRouter.POST("", server.postMenuItem)
+			menuRouter.PUT("/:id", server.putMenuItem)
+			menuRouter.DELETE("/:id", server.deleteMenuItem)
+		}
 	}
 
 	categoriesRouter := server.Router.Group("/categories")
 	{
-		categoriesRouter.POST("", server.postCategory)
 		categoriesRouter.GET("", server.getAllCategories)
-		categoriesRouter.PUT("/:id", server.updateCategory)
 		categoriesRouter.GET("/:category_id", server.listMenuItemsByCategory)
+
+		categoriesRouter.Use(AuthMiddleware)
+		{
+			categoriesRouter.POST("", server.postCategory)
+			categoriesRouter.PUT("/:id", server.updateCategory)
+		}
 	}
 }
