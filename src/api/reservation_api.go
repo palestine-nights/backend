@@ -139,7 +139,7 @@ func (server *Server) updateReservationState(c *gin.Context, state db.State) {
 	err = reservation.Update(server.DB)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, GenericError{Error: "Invalid reservation ID, must be integer"})
+		c.JSON(http.StatusBadRequest, GenericError{Error: err.Error()})
 		return
 	}
 
@@ -150,7 +150,7 @@ func (server *Server) updateReservationState(c *gin.Context, state db.State) {
 	}
 }
 
-/// swagger:route POST /reservations/cancel{id}/ reservations approveReservation
+/// swagger:route POST /reservations/cancel/{id} reservations approveReservation
 /// Approve reservation.
 /// Responses:
 ///   200: State

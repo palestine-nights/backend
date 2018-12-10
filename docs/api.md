@@ -6,10 +6,32 @@
 **Description:** 400: []MenuCategory
 404: GenericError
 
+### /categories/{category_id}
+---
+##### ***GET***
+**Summary:** List menu items with specified category.
+
+**Responses**
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | MenuItem | [ [MenuItem](#menuitem) ] |
+| 500 | GenericError | [GenericError](#genericerror) |
+
 ### /categories/{id}
 ---
 ##### ***PUT***
 **Summary:** Update menu category.
+
+**Responses**
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | MenuCategory | [MenuCategory](#menucategory) |
+| 400 | GenericError | [GenericError](#genericerror) |
+
+##### ***POST***
+**Summary:** Create menu category.
 
 **Responses**
 
@@ -39,18 +61,6 @@
 | ---- | ----------- | ------ |
 | 201 | MenuItem | [MenuItem](#menuitem) |
 | 400 | GenericError | [GenericError](#genericerror) |
-
-### /menu/categories/{category_id}
----
-##### ***GET***
-**Summary:** List menu items with specified category.
-
-**Responses**
-
-| Code | Description | Schema |
-| ---- | ----------- | ------ |
-| 200 | MenuItem | [ [MenuItem](#menuitem) ] |
-| 500 | GenericError | [GenericError](#genericerror) |
 
 ### /menu/{id}
 ---
@@ -108,7 +118,7 @@
 | 200 | State | [State](#state) |
 | 400 | GenericError | [GenericError](#genericerror) |
 
-### /reservations/cancel{id}/
+### /reservations/cancel/{id}
 ---
 ##### ***POST***
 **Summary:** Approve reservation.
