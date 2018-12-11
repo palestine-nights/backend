@@ -54,3 +54,4 @@ CREATE TABLE IF NOT EXISTS `menu` (
   FOREIGN KEY (category_id)
     REFERENCES categories(id)
 ) ENGINE = InnoDB;
+
