@@ -1,18 +1,24 @@
-FROM golang:1.11
+FROM golang:alpine AS build
 
 LABEL maintainer="github@shanaakh.pro"
 
-ENV PORT=8080
 ENV GOPATH=/go
 
 RUN mkdir /go/src/app
 WORKDIR /go/src/app
 COPY . /go/src/app
 
-RUN go get ./...
-RUN go build -o main src/*.go
+RUN apk update && apk add --no-cache git
+RUN go get -v ./...
+RUN go build -o /go/bin/server src/*.go
 
-EXPOSE $PORT
+FROM alpine
 
-CMD ["./main"]
+COPY --from=build /go/bin/server /app/server
+
+WORKDIR /app
+
+EXPOSE 8080
+
+ENTRYPOINT ["./server"]
 
