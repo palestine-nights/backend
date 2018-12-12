@@ -35,7 +35,14 @@ func GetServer(user, password, database, host, port string) *Server {
 	DB := db.Initialize(connectionString)
 
 	router := gin.Default()
-	router.Use(cors.Default())
+
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowCredentials = true
+
+	config.AddAllowHeaders("Authorization")
+	router.Use(cors.New(config))
+
 	server := Server{Router: router, DB: DB}
 
 	server.initializeRouter()
