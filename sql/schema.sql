@@ -55,7 +55,6 @@ CREATE TABLE IF NOT EXISTS `menu` (
     REFERENCES categories(id)
 ) ENGINE = InnoDB;
 
-
 CREATE TABLE IF NOT EXISTS `tokens` (
   id              INT UNSIGNED NOT NULL AUTO_INCREMENT,
   reservation_id  INT UNSIGNED NOT NULL,
