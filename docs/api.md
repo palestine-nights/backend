@@ -231,6 +231,7 @@ largest representable duration to approximately 290 years. |  |
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
+| active | boolean | Active flag for the menu item. | Yes |
 | category_id | integer (uint64) | Category of the menu item. | Yes |
 | description | string | Description of the menu item. | Yes |
 | id | integer (uint64) |  | No |
@@ -262,6 +263,7 @@ largest representable duration to approximately 290 years. |  |
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
+| active | boolean | Active flag for the table. | Yes |
 | description | string | Description of the table. | Yes |
 | id | integer (uint64) |  | No |
 | places | long | Number of places to seat. | Yes |
