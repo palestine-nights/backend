@@ -56,7 +56,9 @@ func (menuItem *MenuItem) Update(db *sqlx.DB) error {
 		return err
 	}
 
-	query := `UPDATE menu SET name=:name, description=:description, price=:price, category_id=:category_id, image_url=:image_url WHERE id=:id`
+	query := `UPDATE menu SET
+		name=:name, description=:description, price=:price, category_id=:category_id, image_url=:image_url, active=:active
+		WHERE id=:id`
 	_, err := db.NamedExec(query, menuItem)
 
 	if err != nil {
@@ -68,9 +70,15 @@ func (menuItem *MenuItem) Update(db *sqlx.DB) error {
 
 // Insert adds new menu item.
 func (menuItem *MenuItem) Insert(db *sqlx.DB) error {
-	sqlStatement := `INSERT INTO menu (name, description, price, category_id, image_url) VALUES (?, ?, ?, ?, ?);`
+	sqlStatement := `INSERT INTO menu (name, description, price, category_id, image_url, active) VALUES (?, ?, ?, ?, ?, ?);`
 
-	result, err := db.Exec(sqlStatement, menuItem.Name, menuItem.Description, menuItem.Price, menuItem.CategoryID, menuItem.ImageURL)
+	result, err := db.Exec(sqlStatement,
+		menuItem.Name,
+		menuItem.Description,
+		menuItem.Price,
+		menuItem.CategoryID,
+		menuItem.ImageURL,
+		menuItem.Active)
 
 	if err != nil {
 		return err

@@ -80,7 +80,10 @@ type MenuItem struct {
 	CategoryID uint64 `json:"category_id" db:"category_id"`
 	// Image URL for the menu item.
 	// required: true
-	ImageURL  string    `json:"image_url" db:"image_url"`
+	ImageURL string `json:"image_url" db:"image_url"`
+	// Active flag for the menu item.
+	// required: true
+	Active    bool      `json:"active" db:"active"`
 	CreatedAt time.Time `json:"-" db:"created_at"`
 	UpdatedAt time.Time `json:"-" db:"updated_at"`
 }
