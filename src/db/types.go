@@ -12,9 +12,12 @@ type Table struct {
 	Places int64 `json:"places" db:"places"`
 	// Description of the table.
 	// required: true
-	Description string    `json:"description" db:"description"`
-	CreatedAt   time.Time `json:"-" db:"created_at"`
-	UpdatedAt   time.Time `json:"-" db:"updated_at"`
+	Description string `json:"description" db:"description"`
+	// Active flag for the table.
+	// required: true
+	Active    bool      `json:"active" db:"active"`
+	CreatedAt time.Time `json:"-" db:"created_at"`
+	UpdatedAt time.Time `json:"-" db:"updated_at"`
 }
 
 // State is string representation of reservation state.

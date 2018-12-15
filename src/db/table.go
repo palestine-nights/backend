@@ -45,7 +45,8 @@ func (table *Table) Update(db *sqlx.DB) error {
 		return err
 	}
 
-	_, err := db.NamedExec(`UPDATE tables SET places=:places, description=:description WHERE id = id`, table)
+	query := `UPDATE tables SET places=:places, description=:description, active=:active WHERE id = :id`
+	_, err := db.NamedExec(query, table)
 
 	if err != nil {
 		return err
@@ -56,9 +57,9 @@ func (table *Table) Update(db *sqlx.DB) error {
 
 // Insert adds new table.
 func (table *Table) Insert(db *sqlx.DB) error {
-	sqlStatement := `INSERT INTO tables (places,description) VALUES (?, ?);`
+	sqlStatement := `INSERT INTO tables (places, description, active) VALUES (?, ?, ?);`
 
-	result, err := db.Exec(sqlStatement, table.Places, table.Description)
+	result, err := db.Exec(sqlStatement, table.Places, table.Description, table.Active)
 
 	if err != nil {
 		return err
