@@ -3,8 +3,12 @@
 ##### ***GET***
 **Summary:** List menu categories.
 
-**Description:** 400: []MenuCategory
-404: GenericError
+**Responses**
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 400 | MenuCategory | [ [MenuCategory](#menucategory) ] |
+| 404 | GenericError | [GenericError](#genericerror) |
 
 ### /categories/{category_id}
 ---
