@@ -100,11 +100,14 @@ jobs:
             git config --global user.name "${BOT_USERNAME}"
             git config --global user.email "${BOT_EMAIL}"
 
-            git add docs/api.md
-            git commit -m -a "[ci skip] Update documentation"
+            if ! git diff-index --quiet HEAD --; then
+              rm docs/api.json
+              git add --all
+              git commit -m "[ci skip] Update documentation"
 
-            git remote set-url origin https://${BOT_USERNAME}:${GITHUB_API_KEY}@github.com/palestine-nights/backend
-            git push origin HEAD:${CIRCLE_BRANCH}
+              git remote set-url origin https://${BOT_USERNAME}:${GITHUB_API_KEY}@github.com/palestine-nights/backend
+              git push origin HEAD:${CIRCLE_BRANCH}
+            fi
 
 workflows:
   version: 2
