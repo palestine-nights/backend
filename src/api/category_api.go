@@ -81,6 +81,7 @@ func (server *Server) listMenuItemsByCategory(c *gin.Context) {
 
 /// swagger:route GET /categories menu getAllCategories
 /// List menu categories.
+/// Responses:
 /// 400: []MenuCategory
 /// 404: GenericError
 func (server *Server) getAllCategories(c *gin.Context) {

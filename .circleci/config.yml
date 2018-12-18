@@ -13,6 +13,10 @@ jobs:
           DATABASE_NAME: circleci
           DATABASE_PORT: 3306
           DATABASE_HOST: localhost
+          GO111MODULE: "on"
+          CGO_ENABLED: 1
+          GOOS: linux
+          GOARCH: amd64
       - image: circleci/mysql
         environment:
           MYSQL_ROOT_PASSWORD: circleci
@@ -27,7 +31,7 @@ jobs:
 
       - run:
           name: Install dependencies
-          command: "go get ./..."
+          command: "go mod download"
 
       - save_cache:
           key: v1-pkg-cache
@@ -43,10 +47,6 @@ jobs:
       - run:
           name: Wait for database
           command: "dockerize -wait tcp://localhost:3306 -timeout 1m"
-
-    # - run:
-    #     name: Run unit tests
-    #     command: "go test ./..."
 
       - run:
           name: Lint code
@@ -78,6 +78,34 @@ jobs:
             docker push palestinenights/backend:$(echo $CIRCLE_SHA1 | cut -c -7)
             docker push palestinenights/backend
 
+  release:
+    docker:
+      - image: circleci/golang:1.11
+    working_directory: /go/src/github.com/palestine-nights/backend
+    steps:
+      - checkout
+      - run:
+          name: "Instlall swagger tools"
+          command: |
+            go get -u github.com/go-swagger/go-swagger/cmd/swagger
+            apk add npm && npm i -g swagger-markdown
+      - run:
+          name: "Generate API documentation"
+          command: |
+            swagger generate spec -m -b=./src -o docs/api.json
+            swagger-markdown -i docs/api.json -o docs/api.md
+      - run:
+          name: "Push updated API documentation"
+          command: |
+            git config --global user.name "${BOT_USERNAME}"
+            git config --global user.email "${BOT_EMAIL}"
+
+            git add docs/api.md
+            git commit -m "[ci skip] Update documentation"
+
+            git remote set-url origin https://${BOT_USERNAME}:${GITHUB_API_KEY}@github.com/palestine-nights/backend
+            git push origin HEAD:${CIRCLE_BRANCH}
+
 workflows:
   version: 2
   test-build:
@@ -89,3 +117,9 @@ workflows:
           filters:
             branches:
               only: master
+      - relase:
+          requires:
+            - push
+          filters:
+            branches:
+                only: master
