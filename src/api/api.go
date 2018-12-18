@@ -6,8 +6,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	_ "github.com/go-sql-driver/mysql"        //
-	_ "github.com/jinzhu/gorm/dialects/mysql" //
+	_ "github.com/go-sql-driver/mysql" //
 	"github.com/jmoiron/sqlx"
 	"github.com/palestine-nights/backend/src/db"
 )
