@@ -43,6 +43,10 @@ jobs:
           command: "dockerize -wait tcp://localhost:3306 -timeout 1m"
 
       - run:
+          name: Test
+          command: "go test -v ./..."
+
+      - run:
           name: Lint code
           command: |
             go get -u golang.org/x/lint/golint
@@ -79,7 +83,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "Instlall swagger tools"
+          name: "Install swagger tools"
           command: |
             sudo apt-get update -y && sudo apt-get upgrade
             curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
@@ -101,7 +105,6 @@ jobs:
             git config --global user.email "${BOT_EMAIL}"
 
             if ! git diff-index --quiet HEAD --; then
-              rm docs/api.json
               git add --all
               git commit -m "[ci skip] Update documentation"
 

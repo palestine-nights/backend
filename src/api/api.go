@@ -2,7 +2,6 @@ package api
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 import (
@@ -10,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql" // TODO: Find why blank import.
 	"github.com/jmoiron/sqlx"
-	"github.com/palestine-nights/backend/src/db"
 )
 
 // GenericError error model.
@@ -30,11 +28,7 @@ type Server struct {
 }
 
 // GetServer returns server instance.
-func GetServer(user, password, database, host, port string) *Server {
-	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", user, password, host, port, database)
-
-	DB := db.Initialize(connectionString)
-
+func GetServer(DB *sqlx.DB) *Server {
 	router := gin.Default()
 
 	config := cors.DefaultConfig()
