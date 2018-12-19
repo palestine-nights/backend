@@ -6,8 +6,10 @@ import (
 	"net/http"
 	"os"
 	"strings"
+)
 
-	jwt "github.com/dgrijalva/jwt-go"
+import (
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 

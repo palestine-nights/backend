@@ -2,7 +2,9 @@ package db
 
 import (
 	"errors"
+)
 
+import (
 	"github.com/jmoiron/sqlx"
 )
 
