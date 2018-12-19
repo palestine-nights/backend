@@ -1,6 +1,8 @@
 package db
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/jmoiron/sqlx"
+)
 
 // GetAll returns list of all tables.
 func (Table) GetAll(db *sqlx.DB) (*[]Table, error) {

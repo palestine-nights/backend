@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+)
 
+import (
 	"github.com/gin-gonic/gin"
 	"github.com/palestine-nights/backend/src/db"
 )
