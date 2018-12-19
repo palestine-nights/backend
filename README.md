@@ -1,8 +1,12 @@
 [license]: ./LICENSE
 [docs]: ./docs
 [docker]: ./Dockerfile
+[ci]: https://circleci.com/gh/palestine-nights/backend
+[ci-badge]: https://circleci.com/gh/palestine-nights/backend.svg?style=svg
 
 # Backend
+
+[![Circle CI][ci-badge]][ci]
 
 > REST API for table reservation
 
