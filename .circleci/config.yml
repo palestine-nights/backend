@@ -54,7 +54,7 @@ jobs:
 
       - run:
           name: Compile source code
-          command: "go build src/*.go"
+          command: "go build src/main.go"
   push:
     machine: true
     steps:

@@ -3,10 +3,13 @@
 [docker]: ./Dockerfile
 [ci]: https://circleci.com/gh/palestine-nights/backend
 [ci-badge]: https://circleci.com/gh/palestine-nights/backend.svg?style=svg
+[go-report]: https://goreportcard.com/report/github.com/palestine-nights/backend
+[go-report-badge]: https://goreportcard.com/badge/github.com/palestine-nights/backend
 
 # Backend
 
 [![Circle CI][ci-badge]][ci]
+[![Go Report][go-report-badge]][go-report]
 
 > REST API for table reservation
 
@@ -17,7 +20,7 @@ Created to avoid issue with CORS, which appears with axios in VueJS Apps.
 Compile source code
 
 ```sh
-$> go build -o main src/*.go
+$> go build -o main src/main.go
 ```
 
 Run server
