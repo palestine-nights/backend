@@ -67,7 +67,7 @@ func (suite *GetTablesSuite) TestGetTables() {
 
 	// Make sure that all expectations were met.
 	if err := suite.Mock.ExpectationsWereMet(); err != nil {
-		suite.T().Errorf("there were unfulfilled expections: %s", err)
+		suite.T().Errorf("there were unfulfilled expectations: %s", err)
 	}
 
 	suite.Equal(suite.Expected, *tables)
@@ -124,7 +124,7 @@ func (suite *FindTableSuite) TestFindTable() {
 
 	// Make sure that all expectations were met.
 	if err := suite.Mock.ExpectationsWereMet(); err != nil {
-		suite.T().Errorf("there were unfulfilled expections: %s", err)
+		suite.T().Errorf("there were unfulfilled expectations: %s", err)
 	}
 
 	suite.Equal(suite.Expected, *table)
@@ -138,18 +138,81 @@ func (suite *FindTableSuite) TestFindTableError() {
 
 	// Call tested function.
 	table, err := Table.Find(Table{}, suite.DB, suite.Expected.ID)
-	suite.Equal(err.Error(),"SQL Error")
+	suite.Equal(err.Error(), "SQL Error")
 	suite.Nil(table)
 
 	// Make sure that all expectations were met.
 	if err := suite.Mock.ExpectationsWereMet(); err != nil {
-		suite.T().Errorf("there were unfulfilled expections: %s", err)
+		suite.T().Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
 
 // In order for 'go test' to run this suite, we need to create
 // a normal test function and pass our suite to suite.Run
-func
-TestFindTableSuite(t *testing.T) {
+func TestFindTableSuite(t *testing.T) {
 	suite.Run(t, new(FindTableSuite))
+}
+
+/* --- Suite 3 --- */
+
+type InsertTableSuite struct {
+	suite.Suite
+
+	Expected Table
+	DB       *sqlx.DB
+	Mock     sqlmock.Sqlmock
+}
+
+func (suite *InsertTableSuite) SetupTest() {
+	db, mock, err := sqlmock.New()
+
+	if err != nil {
+		suite.T().Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	suite.Mock = mock
+	suite.DB = sqlx.NewDb(db, "sqlmock")
+
+	suite.Expected = Table{
+		ID:          1,
+		Places:      2,
+		Description: "Fake Table",
+		Active:      true,
+	}
+}
+
+func (suite *InsertTableSuite) BeforeTest(suiteName, testName string) {
+	// Expect SQL INSERT statement.
+	suite.Mock.ExpectExec("^INSERT INTO tables (.+)").WithArgs(
+		suite.Expected.Places,
+		suite.Expected.Description,
+		suite.Expected.Active,
+	).WillReturnResult(sqlmock.NewResult(int64(suite.Expected.ID),1))
+
+	rows := sqlmock.NewRows([]string{"id", "places", "description", "active"})
+	rows.AddRow(suite.Expected.ID, suite.Expected.Places, suite.Expected.Description, suite.Expected.Active)
+
+	suite.Mock.ExpectQuery("^SELECT (.+) FROM tables WHERE id = (.+)$").WillReturnRows(rows)
+}
+
+func (suite *InsertTableSuite) AfterTest(suiteName, testName string) {
+	// Make sure that all expectations were met.
+	if err := suite.Mock.ExpectationsWereMet(); err != nil {
+		suite.T().Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+	suite.DB.Close()
+}
+
+func (suite *InsertTableSuite) TestInsertTableSuccessfully() {
+	table := suite.Expected
+
+	err := table.Insert(suite.DB)
+
+	suite.Nil(err)
+	suite.Equal(suite.Expected, table)
+}
+
+func TestInsertTableSuite(t *testing.T) {
+	suite.Run(t, new(InsertTableSuite))
 }
