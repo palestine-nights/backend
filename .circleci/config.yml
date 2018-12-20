@@ -104,11 +104,11 @@ jobs:
             git config --global user.name "${BOT_USERNAME}"
             git config --global user.email "${BOT_EMAIL}"
 
-            if ! git diff-index --quiet HEAD --; then
-              git add --all
-              git commit -m "[ci skip] Update documentation"
-
-              git remote set-url origin https://${BOT_USERNAME}:${GITHUB_API_KEY}@github.com/palestine-nights/backend
+            if [ -z "$(git status --porcelain)" ]; then
+              echo "API documentation is up to date!"
+            else
+              git add --all && git commit -m "[ci skip] Update documentation"
+              git remote set-url origin https://${BOT_USERNAME}:${GITHUB_API_KEY}@github.com/palestine-nights/${CIRCLE_PROJECT_USERNAME}
               git push origin HEAD:${CIRCLE_BRANCH}
             fi
 
