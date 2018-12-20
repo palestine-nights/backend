@@ -35,7 +35,7 @@ const (
 	StateCancelled State = "cancelled"
 )
 
-// Reservation model for table reservation proccess.
+// Reservation model for table reservation process.
 //
 // swagger:model
 type Reservation struct {
