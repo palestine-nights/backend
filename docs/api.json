@@ -522,7 +522,7 @@
     },
     "Reservation": {
       "type": "object",
-      "title": "Reservation model for table reservation proccess.",
+      "title": "Reservation model for table reservation process.",
       "required": [
         "table_id",
         "guests",
