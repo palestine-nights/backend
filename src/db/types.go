@@ -29,8 +29,6 @@ type State string
 const (
 	// StateCreated returns state string of created reservation.
 	StateCreated State = "created"
-	// StateConfirmed returns state string of confirmed reservation.
-	StateConfirmed State = "confirmed"
 	// StateApproved returns state string of approved reservation.
 	StateApproved State = "approved"
 	// StateCancelled returns state string of cancelled reservation.
@@ -62,7 +60,7 @@ type Reservation struct {
 	// required: true
 	Time time.Time `json:"time" db:"time"`
 	// Duration of the reservation.
-	// required: true
+	// required: truee
 	Duration  time.Duration `json:"duration" db:"duration"`
 	CreatedAt time.Time     `json:"-" db:"created_at"`
 	UpdatedAt time.Time     `json:"-" db:"updated_at"`
@@ -109,25 +107,3 @@ type MenuCategory struct {
 	CreatedAt time.Time `json:"-" db:"created_at"`
 	UpdatedAt time.Time `json:"-" db:"updated_at"`
 }
-
-// TokenType is string representation of token type.
-type TokenType string
-
-const (
-	// TypeConfirm returns type string of confirmation token.
-	TypeConfirm TokenType = "confirm"
-	// TypeCancel returns type string of cancellation token,.
-	TypeCancel TokenType = "cancel"
-)
-
-// Token object for reservations state manipulation	.
-type Token struct {
-	ID            uint64    `db:"id"`
-	ReservationID uint64    `db:"reservation_id"`
-	Code          string    `db:"code"`
-	Type          TokenType `db:"type"`
-	Used          bool      `db:"used"`
-	CreatedAt     time.Time `db:"created_at"`
-	UpdatedAt     time.Time `db:"updated_at"`
-}
-

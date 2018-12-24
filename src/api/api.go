@@ -54,9 +54,6 @@ func (server *Server) initializeRouter() {
 
 	server.Router.StaticFile("/", "./html/home.html")
 
-	server.Router.GET("/confirm/:code", server.confirmReservation)
-	server.Router.GET("/cancel/:code", server.cancelReservation)
-
 	tablesRouter := server.Router.Group("/tables")
 	{
 		tablesRouter.GET("", server.listTables)

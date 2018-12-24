@@ -2,7 +2,6 @@ package db
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 )
@@ -16,16 +15,6 @@ import (
 // GetStopTime calculates finish time of reservations.
 func (reservation *Reservation) GetStopTime() time.Time {
 	return reservation.Time.Add(reservation.Duration)
-}
-
-// FormattedTime returns time in RFC1123 form.
-func (reservation Reservation) FormattedTime() string {
-	return reservation.Time.Format(time.RFC1123)
-}
-
-// FormattedDuration returns duration in human readable form.
-func (reservation Reservation) FormattedDuration() string {
-	return fmt.Sprintf("%.0f", reservation.Duration.Minutes())
 }
 
 func isOverlap(start1, finish1, start2, finish2 time.Time) bool {
@@ -129,10 +118,6 @@ func (Reservation) Destroy(db *sqlx.DB, id uint64) error {
 		return err
 	}
 
-	if _, err := db.Exec(`DELETE FROM reservations WHERE id = ?;`, id); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -173,10 +158,11 @@ func (reservation *Reservation) Insert(db *sqlx.DB) error {
 // Update puts new values for reservation row fields.
 func (reservation *Reservation) Update(db *sqlx.DB) error {
 	sql := `UPDATE reservations SET
-			state = ?, guests = ?, email = ?, phone = ?, full_name = ?, time = ?, duration = ?
+			table_id = ?, state = ?, guests = ?, email = ?, phone = ?, full_name = ?, time = ?, duration = ?
 	 		WHERE id = ?`
 
 	_, err := db.Exec(sql,
+		reservation.TableID,
 		reservation.State,
 		reservation.Guests,
 		reservation.Email,

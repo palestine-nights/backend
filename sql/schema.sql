@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `reservations` (
   guests       TINYINT UNSIGNED NOT NULL,
   email        VARCHAR(63) NOT NULL,
   phone        VARCHAR(63) NOT NULL,
-  state        ENUM('created', 'confirmed', 'approved', 'cancelled') NOT NULL DEFAULT 'created',
+  state        ENUM('created', 'approved', 'cancelled') NOT NULL DEFAULT 'created',
   full_name    VARCHAR(255) NOT NULL,
   time         DATETIME NOT NULL,
   duration     BIGINT,
@@ -57,15 +57,3 @@ CREATE TABLE IF NOT EXISTS `menu` (
     REFERENCES categories(id)
 ) ENGINE = InnoDB;
 
-CREATE TABLE IF NOT EXISTS `tokens` (
-  id              INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  reservation_id  INT UNSIGNED NOT NULL,
-  code            VARCHAR(16) NOT NULL,
-  type            ENUM('confirm', 'cancel') NOT NULL,
-  used            BOOLEAN  NOT NULL DEFAULT FALSE,
-  created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (id),
-  FOREIGN KEY (reservation_id)
-    REFERENCES reservations(id)
-) ENGINE = InnoDB;
