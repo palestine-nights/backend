@@ -97,6 +97,29 @@
         }
       }
     },
+    "/confirm/{code}": {
+      "get": {
+        "tags": [
+          "reservations"
+        ],
+        "summary": "Confirm reservation.",
+        "operationId": "confirmReservation",
+        "responses": {
+          "200": {
+            "description": "State",
+            "schema": {
+              "$ref": "#/definitions/State"
+            }
+          },
+          "400": {
+            "description": "GenericError",
+            "schema": {
+              "$ref": "#/definitions/GenericError"
+            }
+          }
+        }
+      }
+    },
     "/menu": {
       "get": {
         "tags": [
@@ -232,8 +255,8 @@
         "tags": [
           "reservations"
         ],
-        "summary": "Cancel reservation.",
-        "operationId": "cancelReservation",
+        "summary": "Approve reservation.",
+        "operationId": "approveReservation",
         "responses": {
           "200": {
             "description": "State",
@@ -255,8 +278,8 @@
         "tags": [
           "reservations"
         ],
-        "summary": "Approve reservation.",
-        "operationId": "approveReservation",
+        "summary": "Cancel reservation.",
+        "operationId": "cancelReservation",
         "responses": {
           "200": {
             "description": "State",
@@ -529,7 +552,8 @@
         "email",
         "phone",
         "full_name",
-        "time"
+        "time",
+        "duration"
       ],
       "properties": {
         "duration": {
@@ -618,6 +642,43 @@
           "x-go-name": "Places"
         }
       },
+      "x-go-package": "github.com/palestine-nights/backend/src/db"
+    },
+    "Token": {
+      "type": "object",
+      "title": "Token object for reservations state manipulation\t.",
+      "properties": {
+        "Code": {
+          "type": "string"
+        },
+        "CreatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ID": {
+          "type": "integer",
+          "format": "uint64"
+        },
+        "ReservationID": {
+          "type": "integer",
+          "format": "uint64"
+        },
+        "Type": {
+          "$ref": "#/definitions/TokenType"
+        },
+        "UpdatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "Used": {
+          "type": "boolean"
+        }
+      },
+      "x-go-package": "github.com/palestine-nights/backend/src/db"
+    },
+    "TokenType": {
+      "type": "string",
+      "title": "TokenType is string representation of token type.",
       "x-go-package": "github.com/palestine-nights/backend/src/db"
     }
   }

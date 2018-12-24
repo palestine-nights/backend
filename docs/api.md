@@ -22,18 +22,6 @@
 | 200 | MenuItem | [ [MenuItem](#menuitem) ] |
 | 500 | GenericError | [GenericError](#genericerror) |
 
-### /categories/{category_id}
----
-##### ***GET***
-**Summary:** List menu items with specified category.
-
-**Responses**
-
-| Code | Description | Schema |
-| ---- | ----------- | ------ |
-| 200 | MenuItem | [ [MenuItem](#menuitem) ] |
-| 500 | GenericError | [GenericError](#genericerror) |
-
 ### /categories/{id}
 ---
 ##### ***PUT***
@@ -54,6 +42,18 @@
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
 | 200 | MenuCategory | [MenuCategory](#menucategory) |
+| 400 | GenericError | [GenericError](#genericerror) |
+
+### /confirm/{code}
+---
+##### ***GET***
+**Summary:** Confirm reservation.
+
+**Responses**
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | State | [State](#state) |
 | 400 | GenericError | [GenericError](#genericerror) |
 
 ### /menu
@@ -125,7 +125,7 @@
 ### /reservations/approve/{id}
 ---
 ##### ***POST***
-**Summary:** Cancel reservation.
+**Summary:** Approve reservation.
 
 **Responses**
 
@@ -137,7 +137,7 @@
 ### /reservations/cancel/{id}
 ---
 ##### ***POST***
-**Summary:** Approve reservation.
+**Summary:** Cancel reservation.
 
 **Responses**
 
@@ -259,7 +259,7 @@ largest representable duration to approximately 290 years. |  |
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| duration | [Duration](#duration) |  | No |
+| duration | [Duration](#duration) |  | Yes |
 | email | string | Email of the client. | Yes |
 | full_name | string | Full Name of the client. | Yes |
 | guests | long | Number of people to seat for reservation. | Yes |
@@ -283,3 +283,21 @@ largest representable duration to approximately 290 years. |  |
 | description | string | Description of the table. | Yes |
 | id | integer (uint64) |  | No |
 | places | long | Number of places to seat. | Yes |
+
+### Token  
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| Code | string |  | No |
+| CreatedAt | dateTime |  | No |
+| ID | integer (uint64) |  | No |
+| ReservationID | integer (uint64) |  | No |
+| Type | [TokenType](#tokentype) |  | No |
+| UpdatedAt | dateTime |  | No |
+| Used | boolean |  | No |
+
+### TokenType  
+
+| Name | Type | Description | Required |
+| ---- | ---- | ----------- | -------- |
+| TokenType | string |  |  |
