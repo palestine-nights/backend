@@ -22,6 +22,18 @@
 | 200 | MenuItem | [ [MenuItem](#menuitem) ] |
 | 500 | GenericError | [GenericError](#genericerror) |
 
+### /categories/{category_id}
+---
+##### ***GET***
+**Summary:** List menu items with specified category.
+
+**Responses**
+
+| Code | Description | Schema |
+| ---- | ----------- | ------ |
+| 200 | MenuItem | [ [MenuItem](#menuitem) ] |
+| 500 | GenericError | [GenericError](#genericerror) |
+
 ### /categories/{id}
 ---
 ##### ***PUT***
