@@ -9,7 +9,7 @@ import (
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/palestine-nights/backend/src/db"
+	"github.com/palestine-nights/backend/pkg/db"
 )
 
 /* Table Reservations API */

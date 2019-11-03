@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-)
 
-import (
 	"github.com/jmoiron/sqlx"
-	"github.com/palestine-nights/backend/src/api"
-	"github.com/palestine-nights/backend/src/db"
-	"github.com/palestine-nights/backend/src/tools"
+
+	"github.com/palestine-nights/backend/pkg/api"
+	"github.com/palestine-nights/backend/pkg/db"
+	"github.com/palestine-nights/backend/pkg/tools"
 )
 
 func initializeDB() *sqlx.DB {

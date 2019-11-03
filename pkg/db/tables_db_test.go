@@ -187,7 +187,7 @@ func (suite *InsertTableSuite) BeforeTest(suiteName, testName string) {
 		suite.Expected.Places,
 		suite.Expected.Description,
 		suite.Expected.Active,
-	).WillReturnResult(sqlmock.NewResult(int64(suite.Expected.ID),1))
+	).WillReturnResult(sqlmock.NewResult(int64(suite.Expected.ID), 1))
 
 	rows := sqlmock.NewRows([]string{"id", "places", "description", "active"})
 	rows.AddRow(suite.Expected.ID, suite.Expected.Places, suite.Expected.Description, suite.Expected.Active)

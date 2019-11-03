@@ -8,7 +8,7 @@ import (
 func (MenuItem) GetAll(db *sqlx.DB) (*[]MenuItem, error) {
 	menuItems := make([]MenuItem, 0)
 
-	if err := db.Select(&menuItems, `SELECT * FROM menu;`); err != nil {
+	if err := db.Select(&menuItems, `SELECT * FROM menu`); err != nil {
 		return nil, err
 	}
 
@@ -44,7 +44,7 @@ func (MenuItem) Destroy(db *sqlx.DB, id uint64) error {
 		return err
 	}
 
-	if _, err := db.Exec(`DELETE FROM menu WHERE id = ?;`, id); err != nil {
+	if _, err := db.Exec(`DELETE FROM menu WHERE id = ?`, id); err != nil {
 		return err
 	}
 
@@ -72,7 +72,7 @@ func (menuItem *MenuItem) Update(db *sqlx.DB) error {
 
 // Insert adds new menu item.
 func (menuItem *MenuItem) Insert(db *sqlx.DB) error {
-	sqlStatement := `INSERT INTO menu (name, description, price, category_id, image_url, active) VALUES (?, ?, ?, ?, ?, ?);`
+	sqlStatement := `INSERT INTO menu (name, description, price, category_id, image_url, active) VALUES (?, ?, ?, ?, ?, ?)`
 
 	result, err := db.Exec(sqlStatement,
 		menuItem.Name,
@@ -104,7 +104,7 @@ func (menuItem *MenuItem) Insert(db *sqlx.DB) error {
 func (MenuItem) GetCategories(db *sqlx.DB) ([]string, error) {
 	categories := make([]string, 0)
 
-	if err := db.Select(&categories, `SELECT id, name, order FROM categories;`); err != nil {
+	if err := db.Select(&categories, `SELECT id, name, order FROM categories`); err != nil {
 		return nil, err
 	}
 

@@ -2,10 +2,9 @@ FROM golang:alpine AS build
 
 ENV GO111MODULE=on
 
-# RUN mkdir /go/src/app
 WORKDIR /go/src/app
 
-LABEL maintainer="github@shanaakh.pro"
+LABEL maintainer="ashanaakh@gmail.com"
 
 RUN apk add bash ca-certificates git gcc g++ libc-dev
 
@@ -16,9 +15,7 @@ RUN go mod download
 
 COPY . .
 
-# RUN go build -o /go/bin/server src/main.go
-# RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go install -a -tags netgo  ./src/main.go
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o /go/bin/server src/main.go
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o /go/bin/server cmd/server/main.go
 
 FROM alpine
 
