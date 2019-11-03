@@ -52,20 +52,6 @@ Create menu category.
 | 200 | MenuCategory | [MenuCategory](#menucategory) |
 | 400 | GenericError | [GenericError](#genericerror) |
 
-### /confirm/{code}
-
-#### GET
-##### Summary:
-
-Confirm reservation.
-
-##### Responses
-
-| Code | Description | Schema |
-| ---- | ----------- | ------ |
-| 200 | State | [State](#state) |
-| 400 | GenericError | [GenericError](#genericerror) |
-
 ### /menu
 
 #### GET
@@ -149,13 +135,13 @@ Creates reservation.
 #### POST
 ##### Summary:
 
-Approve reservation.
+Cancel reservation.
 
 ##### Responses
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 200 | State | [State](#state) |
+| 200 |  |  |
 | 400 | GenericError | [GenericError](#genericerror) |
 
 ### /reservations/cancel/{id}
@@ -163,13 +149,13 @@ Approve reservation.
 #### POST
 ##### Summary:
 
-Cancel reservation.
+Approve reservation.
 
 ##### Responses
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 200 | State | [State](#state) |
+| 200 |  |  |
 | 400 | GenericError | [GenericError](#genericerror) |
 
 ### /reservations/{id}
@@ -197,7 +183,7 @@ List all tables.
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 200 | Table | [ [Table](#table) ] |
+| 200 |  |  |
 | 500 | GenericError | [GenericError](#genericerror) |
 
 #### POST
@@ -209,7 +195,7 @@ Creates table.
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 200 | Table | [Table](#table) |
+| 200 |  |  |
 | 400 | GenericError | [GenericError](#genericerror) |
 
 ### /tables/{id}
@@ -223,7 +209,7 @@ Returns table.
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 200 | Table | [Table](#table) |
+| 200 |  |  |
 | 400 | GenericError | [GenericError](#genericerror) |
 | 404 | GenericError | [GenericError](#genericerror) |
 
@@ -236,7 +222,7 @@ Updates table.
 
 | Code | Description | Schema |
 | ---- | ----------- | ------ |
-| 200 | Table | [Table](#table) |
+| 200 |  |  |
 | 400 | GenericError | [GenericError](#genericerror) |
 | 404 | GenericError | [GenericError](#genericerror) |
 
@@ -295,7 +281,7 @@ largest representable duration to approximately 290 years.
 
 | Name | Type | Description | Required |
 | ---- | ---- | ----------- | -------- |
-| duration | [Duration](#duration) |  | Yes |
+| duration | [Duration](#duration) |  | No |
 | email | string | Email of the client. | Yes |
 | full_name | string | Full Name of the client. | Yes |
 | guests | long | Number of people to seat for reservation. | Yes |
@@ -304,36 +290,3 @@ largest representable duration to approximately 290 years.
 | state | string (state) |  | No |
 | table_id | integer (uint64) | ID of table, associated with reservation. | Yes |
 | time | dateTime | Time of the reservation. | Yes |
-
-#### State
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| State | string |  |  |
-
-#### Table
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| active | boolean | Active flag for the table. | Yes |
-| description | string | Description of the table. | Yes |
-| id | integer (uint64) |  | No |
-| places | long | Number of places to seat. | Yes |
-
-#### Token
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| Code | string |  | No |
-| CreatedAt | dateTime |  | No |
-| ID | integer (uint64) |  | No |
-| ReservationID | integer (uint64) |  | No |
-| Type | [TokenType](#tokentype) |  | No |
-| UpdatedAt | dateTime |  | No |
-| Used | boolean |  | No |
-
-#### TokenType
-
-| Name | Type | Description | Required |
-| ---- | ---- | ----------- | -------- |
-| TokenType | string |  |  |
