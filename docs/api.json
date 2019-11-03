@@ -97,29 +97,6 @@
         }
       }
     },
-    "/confirm/{code}": {
-      "get": {
-        "tags": [
-          "reservations"
-        ],
-        "summary": "Confirm reservation.",
-        "operationId": "confirmReservation",
-        "responses": {
-          "200": {
-            "description": "State",
-            "schema": {
-              "$ref": "#/definitions/State"
-            }
-          },
-          "400": {
-            "description": "GenericError",
-            "schema": {
-              "$ref": "#/definitions/GenericError"
-            }
-          }
-        }
-      }
-    },
     "/menu": {
       "get": {
         "tags": [
@@ -255,14 +232,11 @@
         "tags": [
           "reservations"
         ],
-        "summary": "Approve reservation.",
-        "operationId": "approveReservation",
+        "summary": "Cancel reservation.",
+        "operationId": "cancelReservation",
         "responses": {
           "200": {
-            "description": "State",
-            "schema": {
-              "$ref": "#/definitions/State"
-            }
+            "$ref": "#/responses/State"
           },
           "400": {
             "description": "GenericError",
@@ -278,14 +252,11 @@
         "tags": [
           "reservations"
         ],
-        "summary": "Cancel reservation.",
-        "operationId": "cancelReservation",
+        "summary": "Approve reservation.",
+        "operationId": "approveReservation",
         "responses": {
           "200": {
-            "description": "State",
-            "schema": {
-              "$ref": "#/definitions/State"
-            }
+            "$ref": "#/responses/State"
           },
           "400": {
             "description": "GenericError",
@@ -334,13 +305,7 @@
         "operationId": "listTables",
         "responses": {
           "200": {
-            "description": "Table",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Table"
-              }
-            }
+            "$ref": "#/responses/Table"
           },
           "500": {
             "description": "GenericError",
@@ -358,10 +323,7 @@
         "operationId": "postTable",
         "responses": {
           "200": {
-            "description": "Table",
-            "schema": {
-              "$ref": "#/definitions/Table"
-            }
+            "$ref": "#/responses/Table"
           },
           "400": {
             "description": "GenericError",
@@ -381,10 +343,7 @@
         "operationId": "getTable",
         "responses": {
           "200": {
-            "description": "Table",
-            "schema": {
-              "$ref": "#/definitions/Table"
-            }
+            "$ref": "#/responses/Table"
           },
           "400": {
             "description": "GenericError",
@@ -408,10 +367,7 @@
         "operationId": "putTable",
         "responses": {
           "200": {
-            "description": "Table",
-            "schema": {
-              "$ref": "#/definitions/Table"
-            }
+            "$ref": "#/responses/Table"
           },
           "400": {
             "description": "GenericError",
@@ -462,7 +418,7 @@
           "x-go-name": "Error"
         }
       },
-      "x-go-package": "github.com/palestine-nights/backend/src/api"
+      "x-go-package": "github.com/palestine-nights/backend/pkg/api"
     },
     "MenuCategory": {
       "type": "object",
@@ -489,7 +445,7 @@
           "x-go-name": "Order"
         }
       },
-      "x-go-package": "github.com/palestine-nights/backend/src/db"
+      "x-go-package": "github.com/palestine-nights/backend/pkg/db"
     },
     "MenuItem": {
       "type": "object",
@@ -541,7 +497,7 @@
           "x-go-name": "Price"
         }
       },
-      "x-go-package": "github.com/palestine-nights/backend/src/db"
+      "x-go-package": "github.com/palestine-nights/backend/pkg/db"
     },
     "Reservation": {
       "type": "object",
@@ -552,8 +508,7 @@
         "email",
         "phone",
         "full_name",
-        "time",
-        "duration"
+        "time"
       ],
       "properties": {
         "duration": {
@@ -603,83 +558,7 @@
           "x-go-name": "Time"
         }
       },
-      "x-go-package": "github.com/palestine-nights/backend/src/db"
-    },
-    "State": {
-      "type": "string",
-      "format": "state",
-      "title": "State is string representation of reservation state.",
-      "x-go-package": "github.com/palestine-nights/backend/src/db"
-    },
-    "Table": {
-      "type": "object",
-      "title": "Table represents restaurant table.",
-      "required": [
-        "places",
-        "description",
-        "active"
-      ],
-      "properties": {
-        "active": {
-          "description": "Active flag for the table.",
-          "type": "boolean",
-          "x-go-name": "Active"
-        },
-        "description": {
-          "description": "Description of the table.",
-          "type": "string",
-          "x-go-name": "Description"
-        },
-        "id": {
-          "type": "integer",
-          "format": "uint64",
-          "x-go-name": "ID"
-        },
-        "places": {
-          "description": "Number of places to seat.",
-          "type": "integer",
-          "format": "int64",
-          "x-go-name": "Places"
-        }
-      },
-      "x-go-package": "github.com/palestine-nights/backend/src/db"
-    },
-    "Token": {
-      "type": "object",
-      "title": "Token object for reservations state manipulation\t.",
-      "properties": {
-        "Code": {
-          "type": "string"
-        },
-        "CreatedAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "ID": {
-          "type": "integer",
-          "format": "uint64"
-        },
-        "ReservationID": {
-          "type": "integer",
-          "format": "uint64"
-        },
-        "Type": {
-          "$ref": "#/definitions/TokenType"
-        },
-        "UpdatedAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "Used": {
-          "type": "boolean"
-        }
-      },
-      "x-go-package": "github.com/palestine-nights/backend/src/db"
-    },
-    "TokenType": {
-      "type": "string",
-      "title": "TokenType is string representation of token type.",
-      "x-go-package": "github.com/palestine-nights/backend/src/db"
+      "x-go-package": "github.com/palestine-nights/backend/pkg/db"
     }
   }
 }

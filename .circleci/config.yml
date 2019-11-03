@@ -20,7 +20,7 @@ jobs:
       - image: circleci/mysql
         environment:
           MYSQL_ROOT_PASSWORD: circleci
-          MYSQL_ROOT_HOST: '%'
+          MYSQL_ROOT_HOST: "%"
           MYSQL_DATABASE: circleci
     working_directory: /go/src/github.com/palestine-nights/backend
     steps:
@@ -54,7 +54,7 @@ jobs:
 
       - run:
           name: Compile source code
-          command: "go build src/main.go"
+          command: "go build cmd/server/main.go"
   push:
     machine: true
     environment:
@@ -97,7 +97,7 @@ jobs:
           name: "Generate API documentation"
           command: |
             go get ./...
-            swagger generate spec -m -b=./src -o docs/api.json
+            swagger generate spec -m -o docs/api.json
             swagger-markdown -i docs/api.json -o docs/api.md
 
       - run:
@@ -120,14 +120,14 @@ workflows:
     jobs:
       - test
       - push:
-         requires:
-           - test
-         filters:
-           branches:
-             only: master
+          requires:
+            - test
+          filters:
+            branches:
+              only: master
       - release:
-         requires:
-           - push
-         filters:
-           branches:
-               only: master
+          requires:
+            - push
+          filters:
+            branches:
+              only: master

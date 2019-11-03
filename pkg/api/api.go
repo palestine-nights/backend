@@ -2,12 +2,10 @@ package api
 
 import (
 	"database/sql"
-)
 
-import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	_ "github.com/go-sql-driver/mysql" // TODO: Find why blank import.
+	_ "github.com/go-sql-driver/mysql" // Import SQL driver.
 	"github.com/jmoiron/sqlx"
 )
 

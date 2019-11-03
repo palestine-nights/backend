@@ -20,13 +20,33 @@ Created to avoid issue with CORS, which appears with axios in VueJS Apps.
 Compile source code
 
 ```sh
-$> go build -o main src/main.go
+$> go build -o main cmd/server/main.go
 ```
 
 Run server
 
-```
+```sh
 $> ./main
+```
+
+### Swagger
+
+Install latest version of [go-swagger](https://github.com/go-swagger/go-swagger)
+
+```sh
+go get -u github.com/go-swagger/go-swagger/cmd/swagger
+```
+
+Generate swagger documentation
+
+```sh
+swagger generate spec -o docs/api.json --scan-models
+```
+
+Generate markdown documentation
+
+```sh
+swagger-markdown -i docs/api.json -o docs/api.md
 ```
 
 ## Usage
@@ -43,19 +63,20 @@ $> http GET http://localhost:8080/reservations
 
 ```json
 [
-    {
-        "duration": 120,
-        "email": "johndoe@example.com",
-        "full_name": "John Doe",
-        "guests": 5,
-        "id": 1,
-        "phone": "+380123456789",
-        "state": "created",
-        "table_id": 1,
-        "time": "2019-11-25T23:50:00Z"
-    }
+  {
+    "duration": 120,
+    "email": "johndoe@example.com",
+    "full_name": "John Doe",
+    "guests": 5,
+    "id": 1,
+    "phone": "+380123456789",
+    "state": "created",
+    "table_id": 1,
+    "time": "2019-11-25T23:50:00Z"
+  }
 ]
 ```
 
 ## License
+
 Project released under the terms of the MIT [license][license].
